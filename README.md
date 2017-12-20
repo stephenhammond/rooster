@@ -23,7 +23,7 @@ The `/draw-a-card` slash command will prompt the user to select either a list of
 
 ### App Unfurl and Events API
 
-The URL https://rooster.glitch.com is bundled with the app so that if it is included in a message, a random card will be posted to that same channel. The Events API is used to receive `link_shared` events and the app responds using both the `chat.unfurl` API method and a call to `chat.postMessage` with the bot token.  
+The URL https://rooster.glitch.me is bundled with the app so that if it is included in a message, a random card will be posted to that same channel. The Events API is used to receive `link_shared` events and the app responds using both the `chat.unfurl` API method and a call to `chat.postMessage` with the bot token.  
 
 
 ### Web Interface (BETA)
