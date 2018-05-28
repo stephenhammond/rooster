@@ -1,23 +1,29 @@
 var request = require('request')
 var messageMenuOptions = require('./messageMenuOptions.js')
+var dialogOptions = require('./dialogOptions.js')
+var externalOptions = require('./messageMenuOptions.js').menuSelector("externalOptionsToBeFiltered","").options
+
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 var utils = {
 
   //basic function to send a message to Slack using the response URL included with requests
 	sendMessageToSlackURL: function(responseURL, messageContent, responseOptions){
-		messageContent.response_type = responseOptions.response_type;
+    if (messageContent && messageContent.response_type){
+		  messageContent.response_type = responseOptions.response_type;
+    }
     messageContent.replace_original = responseOptions.replace_original;
 		var postOptions = {
 			uri: responseURL,
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json'
-			},
+		  },
 			json: messageContent
-	  	}
-	  	request(postOptions, (err, response, body) => {
+	  }
+	  request(postOptions, (err, response, body) => {
 	  		if(err) throw err
-	  	})
+	  })
 		  
 	},
   
@@ -27,7 +33,7 @@ var utils = {
     messageBody.channel = channelID;
 
     var postOptions = {
-			uri: "https://slack.com/api/chat.postMessage",
+			uri: process.env.SLACK_URL + "/api/chat.postMessage",
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json',
@@ -62,7 +68,7 @@ var utils = {
     unfurls[links[0].url] = messageContent
     data["unfurls"] = JSON.stringify(unfurls)
     request.post(
-      "https://slack.com/api/chat.unfurl",
+      process.env.SLACK_URL + "/api/chat.unfurl",
       {
         form: data
       },
@@ -71,8 +77,92 @@ var utils = {
         console.log(body)
       }
     )  
-	}
+	},
+  openDialog: function(triggerID, dialogSelection){
+		console.log("open dialog!!");
+		var data = {
+      token: process.env.ACCESS_TOKEN,
+		  trigger_id: triggerID,
+		  dialog: JSON.stringify(dialogOptions.dialogSelector(dialogSelection))
+		}
+
+		request.post(
+	          process.env.SLACK_URL + "/api/dialog.open",
+		      {
+		        form: data
+		      },
+		      function (error, response, body) {
+		          if (!error && response.statusCode == 200) {
+		            console.log("Success!")
+		            console.log(body)
+		          } else {
+		            console.log("Fail")
+		            console.log(error) 
+		          }
+		      }
+	   	 )
+	  },
+  
+    setTopic: function(topic, channelID){
+		console.log("open dialog!!");
+      var data = {
+        token: process.env.ACCESS_TOKEN,
+        channel: channelID,
+        topic: topic
+      }
+
+      request.post(
+              process.env.SLACK_URL + "/api/channels.setTopic",
+            {
+              form: data
+            },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                  console.log("Success!")
+                  console.log(body)
+                } else {
+                  console.log("Fail")
+                  console.log(error) 
+                }
+            }
+         )
+	  },
+  createChannel: function(channelName, channelID){
+		console.log("open dialog!!");
+      var data = {
+        token: process.env.ACCESS_TOKEN,
+        name: channelName
+        
+      }
+
+      request.post(
+              process.env.SLACK_URL + "/api/channels.create",
+            {
+              form: data
+            },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                  console.log("Success!")
+                  console.log(body)
+                } else {
+                  console.log("Fail")
+                  console.log(error) 
+                }
+            }
+         )
+
+    
+        
+	  },
+    externalSearch: function(query){
+      var results = []
+      for(var i=0; i<externalOptions.length; i++) {
+            if(externalOptions[i].label.indexOf(query)!=-1) {
+                results.push(externalOptions[i])
+            }
+      }
+      return results
+    }
 }
 
 module.exports = utils
-

@@ -11,20 +11,45 @@ app.use(express.static('public'));
 var utils = require('./utils.js');
 var commandMessageHandler = require('./commandMessageHandler.js');
 var messageMenuOptions = require('./messageMenuOptions.js');
+var databaseUtils = require('./databaseUtils.js');
 
 
-app.get("/", function (request, response) {
+app.get("/", (request, response) => {
   response.sendFile(__dirname + '/views/index.html');
 });
+
+app.get("/install", (request, response) => {
+  response.sendFile(__dirname + '/views/add_to_slack.html');
+});
+
+app.get('/auth/redirect', (req, res) =>{
+	  var options = {
+  	  uri: process.env.SLACK_URL + '/api/oauth.access?code='+req.query.code+'&client_id='+process.env.CLIENT_ID+'&client_secret='+process.env.CLIENT_SECRET+'&redirect_uri='+process.env.REDIRECT_URI,
+		  method: 'GET'
+  	}
+  	request(options, (error, response, body) => {
+  		var jsonResponse = JSON.parse(body)
+  		console.log(jsonResponse)
+  		if (!jsonResponse.ok){
+  			console.log(jsonResponse)
+  			res.send("Error encountered: \n"+JSON.stringify(jsonResponse)).status(200).end()
+  		}else{
+  			console.log(jsonResponse)
+  			databaseUtils.saveInstallData(jsonResponse)
+  			res.send("Success!")
+  		}
+  	})
+})
 
 
 // ROOSTER TIME
 
 // endpoint used for web channel input textbox
-app.post("/card-time", function (req, res) {
+app.post("/card-time", (req, res) => {
+  res.status(200).end();
   var messageContent = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
   utils.sendMessageAsBot(process.env.BOT_ACCESS_TOKEN, messageContent, "#" + req.query.channel); 
-  res.sendStatus(200);
+  //res.sendStatus(200);
 });
 
 // route to handle all slash command requests 
@@ -40,6 +65,14 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       }else{
         utils.sendMessageToSlackURL(responseURL, commandMessageHandler.buttonMenuOptions(reqBody.text), "");
       }
+    }else if (reqBody.command === "/dialog" || reqBody.command === "/dialogwta"){
+      console.log(reqBody);
+      utils.openDialog(reqBody.trigger_id, reqBody.text);
+    
+    }else if (reqBody.command === "/dialogbutton"){ // not used yet 
+      console.log(reqBody);
+      utils.openDialog(reqBody.trigger_id, 5); // hardcoded to dialogOptions type 5 
+    
     }
   }
 	res.status(200).end();
@@ -47,15 +80,64 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
 
 // route to handles all actions from buttons and message menu interactions from user
 app.post('/slack/actions', urlencodedParser, (req, res) =>{
-	var actionJSONPayload = JSON.parse(req.body.payload); // parse URL encoded payload JSON string
-  var callbackID = actionJSONPayload.callback_id;
-  
+	var actionJSONPayload = JSON.parse(req.body.payload) // parse URL encoded payload JSON string
+  var callbackID = actionJSONPayload.callback_id
+  console.log("action received")
+  console.log(actionJSONPayload)
   if (actionJSONPayload.token !==  process.env.APP_VERIFICATION_TOKEN){
 	  res.status(403).end("Access forbidden: The token for the slash command doesn't match.")
+  }
+  else if(actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "set_topic"){
+    res.send('');
+    console.log("set topic here")
+    utils.setTopic(actionJSONPayload.message.text, actionJSONPayload.channel.id)
+    
+  }
+  else if (actionJSONPayload.type == 'message_action'){
+    res.send('');
+    utils.openDialog(actionJSONPayload.trigger_id, 5)
+  
+  }
+  else if(actionJSONPayload.type == 'dialog_submission' && actionJSONPayload.callback_id == "create_channel"){
+    res.send('');
+    console.log("create channel here")
+    utils.createChannel(actionJSONPayload.submission.channelName)
+  //   var message = {
+  //       "text": "Open your new channel",
+  //       "channel": channelID,
+  //       "attachments": [
+  //       {
+  //         "fallback": "Go to your new channel",
+  //         "actions": [
+  //           {
+  //             "type": "button",
+  //             "text": "Go: "+actionJSONPayload.submission.channelName,
+  //             "url": "https://slack.com/app_redirect?channel=+"+channelID
+  //           }
+  //         ]
+  //       }] 
+  //     }
+  }
+  
+  else if (actionJSONPayload.type == 'dialog_submission'){
+    res.send('');
+    var message = {
+      "attachments": [
+        {
+          "text": "Dialog or Message Action success"
+        }
+      ]
+		}
+    var responseOptions = {}; 
+    responseOptions.response_type = "in_channel";
+    responseOptions.replace_original = "true";
+    utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
+    
   }else{
     var responseOptions = {}; // used as flag for replace, bot, webhook, etc options 
     switch (callbackID){  
       case 'destination_selection':
+        //utils.openDialog(actionJSONPayload.trigger_id, 5)
         var menuType = actionJSONPayload.actions[0].value; // "users" or "conversations"
         var menuToSend = messageMenuOptions.menuSelector(menuType, "send_card");
         var responseOptions = {}; // used as flag for replace, bot, webhook, etc options
@@ -63,13 +145,17 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
         responseOptions.replace_original = "true";
         // send ephemeral menu to replace button message 
         utils.sendMessageToSlackURL(actionJSONPayload.response_url, menuToSend, responseOptions);
-        res.status(200).end();
+        res.send('');
         break; 
       case 'send_card':
-        var cardDestination = actionJSONPayload.actions[0].selected_options[0].value;
+        if (actionJSONPayload.type == "message_action"){
+          var cardDestination = actionJSONPayload.message.user; //
+        }else{
+          var cardDestination = actionJSONPayload.actions[0].selected_options[0].value;
+        }
         var messageContent = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
         utils.sendMessageAsBot(process.env.BOT_ACCESS_TOKEN, messageContent, cardDestination);
-        res.status(200).end();
+        res.send('Card sent');
         break;
       default:
         console.log("shoot");
@@ -81,6 +167,7 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
 
 app.post('/slack/events/', JSONParser, (req, res) =>{
 	var event = req.body.event;
+  console.log(event);
 	if (req.body.challenge){
 		if (req.body.token === process.env.APP_VERIFICATION_TOKEN){
 			res.send(req.body.challenge);
@@ -91,7 +178,7 @@ app.post('/slack/events/', JSONParser, (req, res) =>{
     // rooster.glitch.me links to unfurl some cards because this was in high demand from my millions users 
 		res.status(200).end();
     var randomCard = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
-    var unfurlMessage= {"text": "Let\'s shuffle the deck!"};
+    var unfurlMessage= {"text": "Let\'s shuffle the deck! <@U14M0KP89>"};
 		utils.handleAppUnfurling(process.env.ACCESS_TOKEN, event.channel, event.message_ts, event.links, unfurlMessage);
     utils.sendMessageAsBot(process.env.BOT_ACCESS_TOKEN, randomCard, event.channel);
 	}
@@ -100,6 +187,29 @@ app.post('/slack/events/', JSONParser, (req, res) =>{
 	}
 });
 
+
+app.post('/slack/options-load-point', urlencodedParser, (req, res) =>{
+	// var body = JSON.parse(req)
+	console.log("Request to /slack/options-load-point")
+	
+	var actionJSONPayload = JSON.parse(req.body.payload)
+	console.log("Action sent to load URL:")
+	console.log(actionJSONPayload)
+
+	//console.log(messageMenuOptions.menuSelector("externalOptionsToBeFiltered"))
+	if (actionJSONPayload.token == process.env.APP_VERIFICATION_TOKEN){
+		//res.send(messageMenuOptions.menuSelector("externalOptionsToBeFiltered"))
+		var results = {};
+		results.options = utils.externalSearch(actionJSONPayload.value)
+		console.log("results!!!")
+    console.log(results)
+		res.send(results)
+
+	}else{
+		res.status(403).end("Access forbidden")
+	}
+
+})
 
 app.listen(process.env.PORT || 3000, () => {
     console.log('Rooster server launched!')

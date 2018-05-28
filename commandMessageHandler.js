@@ -24,7 +24,13 @@ var commmandMessageHandler = {
               "name": "conversations",
               "text": "Conversations",
               "type": "button",
-              "value": "conversations"
+              "value": "conversations",
+              // "confirm": {
+              //   "title": "Are you sure?",
+              //   "text": "Wouldn't you prefer a users?",
+              //   "ok_text": "Yes",
+              //   "dismiss_text": "No"
+              // }
             }
           ]
         },   
@@ -41,7 +47,21 @@ var commmandMessageHandler = {
               "value": "users"
             }
           ]
-        }
+        },   
+        // {
+        //   "fallback": "You are unable to choose a type of message menu",
+        //   "callback_id": "destination_selection"+callbackOption,
+        //   "color": "#3EB890",
+        //   "attachment_type": "default",
+        //   "actions": [
+        //     {
+        //       "name": "dialog",
+        //       "text": "dialog ",
+        //       "type": "button",
+        //       "value": "dialog"
+        //     }
+        //   ]
+        // }
 			]
 		}
 		return message
