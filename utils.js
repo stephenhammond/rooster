@@ -78,10 +78,10 @@ var utils = {
       }
     )  
 	},
-  openDialog: function(triggerID, dialogSelection){
+  openDialog: function(token, triggerID, dialogSelection){
 		console.log("open dialog!!");
 		var data = {
-      token: process.env.ACCESS_TOKEN,
+      token: token, //process.env.ACCESS_TOKEN,
 		  trigger_id: triggerID,
 		  dialog: JSON.stringify(dialogOptions.dialogSelector(dialogSelection))
 		}
@@ -103,53 +103,51 @@ var utils = {
 	   	 )
 	  },
   
-    setTopic: function(topic, channelID){
+  setTopic: function(token, topic, channelID){
 		console.log("open dialog!!");
-      var data = {
-        token: process.env.ACCESS_TOKEN,
-        channel: channelID,
-        topic: topic
-      }
+    var data = {
+      token: token,
+      channel: channelID,
+      topic: topic
+    }
 
-      request.post(
-              process.env.SLACK_URL + "/api/channels.setTopic",
-            {
-              form: data
-            },
-            function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                  console.log("Success!")
-                  console.log(body)
-                } else {
-                  console.log("Fail")
-                  console.log(error) 
-                }
+    request.post(
+        process.env.SLACK_URL + "/api/channels.setTopic",
+        {
+          form: data
+        },
+        function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+              console.log("Success!")
+              console.log(body)
+            } else {
+              console.log("Fail")
+              console.log(error) 
             }
-         )
-	  },
-  createChannel: function(channelName, channelID){
-		console.log("open dialog!!");
+        }
+     )
+  },
+  createChannel: function(token, channelName, channelID){
+		console.log("create channel!");
       var data = {
-        token: process.env.ACCESS_TOKEN,
+        token: token,
         name: channelName
-        
       }
-
       request.post(
-              process.env.SLACK_URL + "/api/channels.create",
-            {
-              form: data
-            },
-            function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                  console.log("Success!")
-                  console.log(body)
-                } else {
-                  console.log("Fail")
-                  console.log(error) 
-                }
+        process.env.SLACK_URL + "/api/channels.create",
+        {
+          form: data
+        },
+        function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+              console.log("Success!")
+              console.log(body)
+            } else {
+              console.log("Fail")
+              console.log(error) 
             }
-         )
+        }
+      )
 
     
         
@@ -157,9 +155,9 @@ var utils = {
     externalSearch: function(query){
       var results = []
       for(var i=0; i<externalOptions.length; i++) {
-            if(externalOptions[i].label.indexOf(query)!=-1) {
-                results.push(externalOptions[i])
-            }
+        if(externalOptions[i].label.indexOf(query)!=-1) {
+            results.push(externalOptions[i])
+        }
       }
       return results
     }

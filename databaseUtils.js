@@ -6,19 +6,23 @@ var Promise = require('promise')
 
 var databaseUtils = {
 
-	getUserAuthData: function(requestData, responseOptions){
-		
-		mongodb.MongoClient.connect(uri, function(err, client) {
-  			if(err) throw err
-  			var db = client.db('bradslavin')
-  			db.collection('app_installs').findOne({ team_id: requestData.team.id}, function(err, doc) {
-			    assert.equal(err, null)
-			    console.log("Found the following records")
-			    console.dir(doc)
-			    return doc
-		  	})
-    	})
+	getToken: function(teamID){
+		return new Promise(
+      function (resolve, reject) {
+        mongodb.MongoClient.connect(uri, function(err, client) {
+          if(err) reject(err)
+          var db = client.db('bradslavin')
+          db.collection('app_installs').findOne({ team_id: teamID}, function(err, doc) {
+            assert.equal(err, null)
+            console.log("Found the following records")
+            console.dir(doc)
+            resolve(doc.access_token)   
+          })
+        })
+      }    
+    )    
 	},
+
 
 	getWebhookURL: function(requestData, responseOptions){
 		return new Promise(
@@ -41,22 +45,22 @@ var databaseUtils = {
     	)
 	},
 
-	getBotToken: function(requestData, responseOptions){
+	getBotToken: function(teamID, responseOptions){
 		return new Promise(
 	  		function (resolve, reject) {
 				mongodb.MongoClient.connect(uri, function(err, client) {
-		  			if(err) throw err
-		  			var db = client.db('bradslavin')
-		  			db.collection('app_installs').findOne({ team_id: requestData.team.id, bot:{$exists:true}}, function(err, doc) {
-					    assert.equal(err, null)
-					    console.log("Found the following bot token: ")
-					    console.dir(doc.bot.bot_access_token)
-            			resolve(doc.bot.bot_access_token)
-            			reject(err)
+          if(err) throw err
+          var db = client.db('bradslavin')
+          db.collection('app_installs').findOne({ team_id: teamID, bot:{$exists:true}}, function(err, doc) {
+            assert.equal(err, null)
+            console.log("Found the following bot token: ")
+            console.dir(doc.bot.bot_access_token)
+            resolve(doc.bot.bot_access_token)
+            reject(err)
 					})
 					client.close(function (err) {
-		              	if(err) throw err
-		             })
+		        if(err) throw err
+		      })
 				})
     		}
     	)

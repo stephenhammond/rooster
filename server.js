@@ -55,10 +55,12 @@ app.post("/card-time", (req, res) => {
 // route to handle all slash command requests 
 app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
 	var reqBody = req.body;
+  console.log(reqBody)
 	var responseURL = reqBody.response_url;
 	if (reqBody.token !=  process.env.APP_VERIFICATION_TOKEN){
 	  res.status(403).end("Access forbidden: The token for the slash command doesn't match.");
   }else{
+    res.status(200).end();
     if (reqBody.command === "/draw-a-card"){
       if (reqBody.text === "help"){
         utils.sendMessageToSlackURL(responseURL, commandMessageHandler.help(), "");
@@ -67,15 +69,16 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       }
     }else if (reqBody.command === "/dialog" || reqBody.command === "/dialogwta"){
       console.log(reqBody);
-      utils.openDialog(reqBody.trigger_id, reqBody.text);
-    
+      return databaseUtils.getToken(reqBody.team_id).then(function(token){
+				utils.openDialog(token, reqBody.trigger_id, reqBody.text);
+			})
     }else if (reqBody.command === "/dialogbutton"){ // not used yet 
       console.log(reqBody);
-      utils.openDialog(reqBody.trigger_id, 5); // hardcoded to dialogOptions type 5 
+      //utils.openDialog(token, reqBody.trigger_id, 5); // hardcoded to dialogOptions type 5 
     
     }
   }
-	res.status(200).end();
+	
 });
 
 // route to handles all actions from buttons and message menu interactions from user
@@ -90,18 +93,25 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
   else if(actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "set_topic"){
     res.send('');
     console.log("set topic here")
-    utils.setTopic(actionJSONPayload.message.text, actionJSONPayload.channel.id)
+    return databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+      utils.setTopic(token, actionJSONPayload.message.text, actionJSONPayload.channel.id)
+    })
     
   }
   else if (actionJSONPayload.type == 'message_action'){
     res.send('');
-    utils.openDialog(actionJSONPayload.trigger_id, 5)
-  
+    return databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+			utils.openDialog(token, actionJSONPayload.trigger_id, 5)
+    })
   }
   else if(actionJSONPayload.type == 'dialog_submission' && actionJSONPayload.callback_id == "create_channel"){
     res.send('');
     console.log("create channel here")
-    utils.createChannel(actionJSONPayload.submission.channelName)
+    databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+			utils.createChannel(token, actionJSONPayload.submission.channelName)
+    })
+    
+    
   //   var message = {
   //       "text": "Open your new channel",
   //       "channel": channelID,
@@ -178,9 +188,13 @@ app.post('/slack/events/', JSONParser, (req, res) =>{
     // rooster.glitch.me links to unfurl some cards because this was in high demand from my millions users 
 		res.status(200).end();
     var randomCard = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
-    var unfurlMessage= {"text": "Let\'s shuffle the deck! <@U14M0KP89>"};
-		utils.handleAppUnfurling(process.env.ACCESS_TOKEN, event.channel, event.message_ts, event.links, unfurlMessage);
-    utils.sendMessageAsBot(process.env.BOT_ACCESS_TOKEN, randomCard, event.channel);
+    var unfurlMessage = {"text": "Let\'s shuffle the deck! <@"+event.user+">"};
+    databaseUtils.getToken(req.body.team_id).then(function(token){
+			utils.handleAppUnfurling(token, event.channel, event.message_ts, event.links, unfurlMessage);
+    })
+    databaseUtils.getBotToken(req.body.team_id).then(function(token){
+		  utils.sendMessageAsBot(token, randomCard, event.channel);
+    })
 	}
 	else{
 		res.status(200).end();
