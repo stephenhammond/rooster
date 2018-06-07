@@ -6,7 +6,7 @@ var dialogOptions = {
 		var options = {
 			"1": {
 			   
-			    	"callback_id": "create_channel",
+			  "callback_id": "create_channel",
 				// "title": "🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎🌎",
 				// "submit_label": "Roostertime!",
 				// "elements": [
@@ -348,7 +348,7 @@ var dialogOptions = {
 								"label": "External Time",
 								"type": "select",
 								"data_source": "external",
-								"min_query_length": 0, // TEST THIS!
+								"min_query_length": 1, // TEST THIS!
                 "selected_options":[
                   {
                     "value": "what",

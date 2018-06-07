@@ -65,7 +65,7 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       if (reqBody.text === "help"){
         utils.sendMessageToSlackURL(responseURL, commandMessageHandler.help(), "");
       }else{
-        utils.sendMessageToSlackURL(responseURL, commandMessageHandler.buttonMenuOptions(reqBody.text), "");
+        utils.sendMessageToSlackURL(responseURL, commandMessageHandler.usersAndConversationsButtons(reqBody.text), "");
       }
     }else if (reqBody.command === "/dialog" || reqBody.command === "/dialogwta"){
       console.log(reqBody);
@@ -97,6 +97,12 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
       utils.setTopic(token, actionJSONPayload.message.text, actionJSONPayload.channel.id)
     })
     
+  }
+  else if (actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "create_channel"){
+    res.send('');
+    return databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+			utils.openDialog(token, actionJSONPayload.trigger_id, 1)
+    })
   }
   else if (actionJSONPayload.type == 'message_action'){
     res.send('');
@@ -163,8 +169,12 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
         }else{
           var cardDestination = actionJSONPayload.actions[0].selected_options[0].value;
         }
+        
         var messageContent = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
-        utils.sendMessageAsBot(process.env.BOT_ACCESS_TOKEN, messageContent, cardDestination);
+        databaseUtils.getBotToken(actionJSONPayload.team.id).then(function(token){
+		       utils.sendMessageAsBot(token, messageContent, cardDestination);
+        })
+       
         res.send('Card sent');
         break;
       default:

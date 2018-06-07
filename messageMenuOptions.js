@@ -4,24 +4,39 @@ var messageMenuOptions = {
 		var options = {
 
 			"externalOptionsToBeFiltered": {
-			    "options": [
-			        {
-				          "value": "1",
-			            "label": "Felicia Wolf",
-                	"description": "felicia!!"
-			        },
-			        {
-			            "value": "2",
-			            "label": "Welch Wilkerson",
-                	"description": "Welchie!!"
-			        },
-			        {
-			            "value": "3",
-			            "label": "Buck Blankenship",
-                	"description": "Buckster!"
-			        }
+			    "options": //[
+			        //{
+				          //"value": "1",
+			            //"label": "Felicia Wolf",
+                	//"description": "felicia!!"
+			       // },
+			       // {
+			          //  "value": "2",
+			         //   "label": "Welch Wilkerson",
+               // 	"description": "Welchie!!"
+			      //  },
+			      //  {
+			          //  "value": "3",
+			          //  "label": "Buck Blankenship",
+               // 	"description": "Buckster!"
+			       // }
 	
-			     ],
+			     //],
+        
+        [
+           {
+              "label":"InRule Technology, Inc.",
+              "value":"InRuleTechnology"
+           },
+           {  
+             "label":"Acme Corp",
+              "value":"AcmeCorp"
+           },
+           {
+             "label":"Lorm Ipsum",
+             "value":"LoremIpsum"
+           }
+        ]
 			    // "option_groups": [
 			    // {
 			    // "label": "Visual Design",

@@ -10,9 +10,10 @@ var commmandMessageHandler = {
 		}
 		return message
 	},
-	buttonMenuOptions: function(callbackOption){
+	usersAndConversationsButtons: function(callbackOption){
 		var message = {
       "text": "Choose where to send a random card",
+      "pretext":"this is a lot of pretext this is a lot of pretext this is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretext",
       "attachments": [
         {
           "fallback": "You are unable to choose a type of message menu",
