@@ -67,7 +67,13 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       }else{
         utils.sendMessageToSlackURL(responseURL, commandMessageHandler.usersAndConversationsButtons(reqBody.text), "");
       }
-    }else if (reqBody.command === "/dialog" || reqBody.command === "/dialogwta"){
+    }else if (reqBody.command === "/block-kit"){
+      console.log(reqBody);
+      return databaseUtils.getToken(reqBody.team_id).then(function(token){
+				utils.openDialog(token, reqBody.trigger_id, "blocks");
+			})
+    }
+    else if (reqBody.command === "/dialog" || reqBody.command === "/dialogwta"){
       console.log(reqBody);
       return databaseUtils.getToken(reqBody.team_id).then(function(token){
 				utils.openDialog(token, reqBody.trigger_id, reqBody.text);
@@ -83,9 +89,9 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
 
 // route to handles all actions from buttons and message menu interactions from user
 app.post('/slack/actions', urlencodedParser, (req, res) =>{
+  console.log("action received")
 	var actionJSONPayload = JSON.parse(req.body.payload) // parse URL encoded payload JSON string
   var callbackID = actionJSONPayload.callback_id
-  console.log("action received")
   console.log(actionJSONPayload)
   if (actionJSONPayload.token !==  process.env.APP_VERIFICATION_TOKEN){
 	  res.status(403).end("Access forbidden: The token for the slash command doesn't match.")
@@ -116,6 +122,21 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
 			utils.createChannel(token, actionJSONPayload.submission.channelName)
     })
+  } 
+  else if(actionJSONPayload.type == 'dialog_submission' && actionJSONPayload.callback_id == "blocks"){
+    res.send('');
+    console.log("create custom block message")
+    utils.createBlockMessage(actionJSONPayload.submission).then(function(message){
+			  // databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+			  // utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id)
+			  // })
+      var responseOptions = {}; 
+      responseOptions.response_type = "in_channel";
+      responseOptions.replace_original = "true";
+      console.log("HERE!!");
+      utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
+    })
+  }
     
     
   //   var message = {
@@ -133,7 +154,7 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
   //         ]
   //       }] 
   //     }
-  }
+  
   
   else if (actionJSONPayload.type == 'dialog_submission'){
     res.send('');

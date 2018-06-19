@@ -1,7 +1,10 @@
 var request = require('request')
 var messageMenuOptions = require('./messageMenuOptions.js')
 var dialogOptions = require('./dialogOptions.js')
+var blockOptions = require('./blockOptions.js')
 var externalOptions = require('./messageMenuOptions.js').menuSelector("externalOptionsToBeFiltered","").options
+var assert = require('assert')
+var Promise = require('promise')
 
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -23,6 +26,8 @@ var utils = {
 	  }
 	  request(postOptions, (err, response, body) => {
 	  		if(err) throw err
+        console.log(body)  
+        console.log(err)
 	  })
 		  
 	},
@@ -31,6 +36,7 @@ var utils = {
   sendMessageAsBot: function(token, messageBody, channelID){
     var postData = messageBody;
     messageBody.channel = channelID;
+    messageBody.as_user = false;
 
     var postOptions = {
 			uri: process.env.SLACK_URL + "/api/chat.postMessage",
@@ -160,7 +166,56 @@ var utils = {
         }
       }
       return results
-    }
+    },
+   createBlockMessage: function(blockSelections){
+     console.log("Create block message util")
+     console.log(blockSelections)
+     return new Promise(
+				function (resolve, reject) {
+        
+          var blocksArray = []
+          for (var propName in blockSelections) { 
+            if (blockSelections[propName] !== null) {
+              blocksArray.push(blockOptions.blockSelector(blockSelections[propName]));
+            }
+            
+          }
+          
+          var message = {
+           "text": "*Here's your Block Kit message:*",
+            "attachments":[
+              {
+                "blocks": blocksArray
+                
+            
+              }
+            ]
+          }     
+          console.log("message")
+          console.log(message)
+          resolve(message)
+        })
+				// return new Promise(
+				// function (resolve, reject) {
+				// mongodb.MongoClient.connect(uri, function(err, client) {
+				// if(err) throw err
+				// var db = client.db('bradslavin')
+				// db.collection('app_installs').findOne({ team_id: teamID, bot:{$exists:true}}, function(err, doc) {
+				// assert.equal(err, null)
+				// console.log("Found the following bot token: ")
+				// console.dir(doc.bot.bot_access_token)
+				// resolve(doc.bot.bot_access_token)
+				// reject(err)
+				// 	})
+				// 	client.close(function (err) {
+				// if(err) throw err
+				// })
+				// })
+				// }
+				// )
+    
+   
+   }
 }
 
 module.exports = utils

@@ -359,7 +359,7 @@ var dialogOptions = {
           }
 				]
 			},
-			"6": {
+			"max": {
 			   
 			    "callback_id": "simple-dialog-example",
 				  "title": "Rooster Dialog Greatness",
@@ -435,9 +435,300 @@ var dialogOptions = {
 				    		"placeholder": "enter something here",
 				    		"subtype": "",
 				    		"value": ""
+					},
+          {
+					    	"type": "select", //required
+                "data_source": "users",
+					    	"label": "Users", // required
+					    	"name": "first", // required
+                "hint": "pick a buddy",
+                "value": "U4AB1FRM0"
+					},
+					{
+					    	"type": "select", //required
+                "data_source": "conversations",
+					    	"label": "Conversations", // required
+					    	"name": "conversations",
+                "value": "C3H4FF94K",
+					},
+					{
+					    	"type": "select", //required
+                "data_source": "channels",
+					    	"label": "Channels", // required
+					    	"name": "Channels",
+                "value": "C3H4FF94K",
 					}
 				]
-			}						
+			},
+      
+      "blocks": {
+			   
+			    "callback_id": "blocks",
+				  "title": "Create Block Kit Message",
+          "notify_on_cancel": true,
+				  "elements": [
+            {
+                "label": "Block 1",
+                "type": "select",
+                "name": "block_1",
+                "optional": true,
+                "options": [
+                  {
+                    "label": "Text",
+                    "value": "1"
+                  },
+                  {
+                    "label": "Image",
+                    "value": "2"
+                  },
+                  {
+                    "label": "Context",
+                    "value": "3"
+                  },
+                  {
+                    "label": "Text Group",
+                    "value": "4"
+                  },
+                  {
+                    "label": "Action",
+                    "value": "5"
+                  },
+                  {
+                    "label": "Divider",
+                    "value": "6"
+                  },
+                  {
+                    "label": "Text with Image",
+                    "value": "7"
+                  },
+                  {
+                    "label": "Text with Button",
+                    "value": "8"
+                  },
+                  {
+                    "label": "Text with Select",
+                    "value": "9"
+                  },
+                  {
+                    "label": "Text with Overflow",
+                    "value": "10"
+                  },
+                  {
+                    "label": "Text with Datepicker",
+                    "value": "11"
+                  } 
+                ]
+            },
+            {
+                "label": "Block 2",
+                "type": "select",
+                "name": "block_2",
+                "optional": true,
+                "options": [
+                  {
+                    "label": "Text",
+                    "value": "1"
+                  },
+                  {
+                    "label": "Image",
+                    "value": "2"
+                  },
+                  {
+                    "label": "Context",
+                    "value": "3"
+                  },
+                  {
+                    "label": "Text Group",
+                    "value": "4"
+                  },
+                  {
+                    "label": "Action",
+                    "value": "5"
+                  },
+                  {
+                    "label": "Divider",
+                    "value": "6"
+                  },
+                  {
+                    "label": "Text with Image",
+                    "value": "7"
+                  },
+                  {
+                    "label": "Text with Button",
+                    "value": "8"
+                  },
+                  {
+                    "label": "Text with Select",
+                    "value": "9"
+                  },
+                  {
+                    "label": "Text with Overflow",
+                    "value": "10"
+                  },
+                  {
+                    "label": "Text with Datepicker",
+                    "value": "11"
+                  } 
+                ]
+            },
+            {
+              "label": "Block 3",
+              "type": "select",
+              "name": "block_3",
+              "optional": true,
+              "options": [
+                {
+                  "label": "Text",
+                  "value": "1"
+                },
+                {
+                  "label": "Image",
+                  "value": "2"
+                },
+                {
+                  "label": "Context",
+                  "value": "3"
+                },
+                {
+                  "label": "Text Group",
+                  "value": "4"
+                },
+                {
+                  "label": "Action",
+                  "value": "5"
+                },
+                {
+                  "label": "Divider",
+                  "value": "6"
+                },
+                {
+                  "label": "Text with Image",
+                  "value": "7"
+                },
+                {
+                  "label": "Text with Button",
+                  "value": "8"
+                },
+                {
+                  "label": "Text with Select",
+                  "value": "9"
+                },
+                {
+                  "label": "Text with Overflow",
+                  "value": "10"
+                },
+                {
+                  "label": "Text with Datepicker",
+                  "value": "11"
+                } 
+              ]
+            },
+            {
+              "label": "Block 4",
+              "type": "select",
+              "name": "block_4",
+              "optional": true,
+              "options": [
+                {
+                  "label": "Text",
+                  "value": "1"
+                },
+                {
+                  "label": "Image",
+                  "value": "2"
+                },
+                {
+                  "label": "Context",
+                  "value": "3"
+                },
+                {
+                  "label": "Text Group",
+                  "value": "4"
+                },
+                {
+                  "label": "Action",
+                  "value": "5"
+                },
+                {
+                  "label": "Divider",
+                  "value": "6"
+                },
+                {
+                  "label": "Text with Image",
+                  "value": "7"
+                },
+                {
+                  "label": "Text with Button",
+                  "value": "8"
+                },
+                {
+                  "label": "Text with Select",
+                  "value": "9"
+                },
+                {
+                  "label": "Text with Overflow",
+                  "value": "10"
+                },
+                {
+                  "label": "Text with Datepicker",
+                  "value": "11"
+                } 
+              ]
+            },
+            {
+              "label": "Block 5",
+              "type": "select",
+              "name": "block_5",
+              "optional": true,
+              "options": [
+                {
+                  "label": "Text",
+                  "value": "1"
+                },
+                {
+                  "label": "Image",
+                  "value": "2"
+                },
+                {
+                  "label": "Context",
+                  "value": "3"
+                },
+                {
+                  "label": "Text Group",
+                  "value": "4"
+                },
+                {
+                  "label": "Action",
+                  "value": "5"
+                },
+                {
+                  "label": "Divider",
+                  "value": "6"
+                },
+                {
+                  "label": "Text with Image",
+                  "value": "7"
+                },
+                {
+                  "label": "Text with Button",
+                  "value": "8"
+                },
+                {
+                  "label": "Text with Select",
+                  "value": "9"
+                },
+                {
+                  "label": "Text with Overflow",
+                  "value": "10"
+                },
+                {
+                  "label": "Text with Datepicker",
+                  "value": "11"
+                } 
+              ]
+            }
+          ]
+      }
 		}
 		return options[input]
 
