@@ -6,13 +6,13 @@ var Promise = require('promise')
 
 var databaseUtils = {
 
-	getToken: function(teamID){
+	getToken: function(teamID,dbCollection){
 		return new Promise(
       function (resolve, reject) {
         mongodb.MongoClient.connect(uri, function(err, client) {
           if(err) reject(err)
           var db = client.db('bradslavin')
-          db.collection('app_installs').findOne({ team_id: teamID}, function(err, doc) {
+          db.collection(dbCollection).findOne({ team_id: teamID}, function(err, doc) {
             assert.equal(err, null)
             console.log("Found the following records")
             console.dir(doc)
@@ -69,9 +69,14 @@ var databaseUtils = {
 	saveInstallData: function(oauthResponse){
   		mongodb.MongoClient.connect(uri, function(err, client) {
   			//if(err) throw err
+        var dbCollection = 'app_installs';
         console.log(err)
+        if(oauthResponse.app_id == "A628U0LN7"){
+          dbCollection = 'wta_installs';
+        }
+
   			var db = client.db('bradslavin');
-  			db.collection('app_installs').insert(oauthResponse, function(err, result) {
+  			db.collection(dbCollection).insert(oauthResponse, function(err, result) {
     			if(err) throw err
 
     		})

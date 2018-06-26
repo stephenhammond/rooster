@@ -23,8 +23,29 @@ app.get("/install", (request, response) => {
 });
 
 app.get('/auth/redirect', (req, res) =>{
+    console.log(req)
 	  var options = {
   	  uri: process.env.SLACK_URL + '/api/oauth.access?code='+req.query.code+'&client_id='+process.env.CLIENT_ID+'&client_secret='+process.env.CLIENT_SECRET+'&redirect_uri='+process.env.REDIRECT_URI,
+		  method: 'GET'
+  	}
+  	request(options, (error, response, body) => {
+  		var jsonResponse = JSON.parse(body)
+  		console.log(jsonResponse)
+  		if (!jsonResponse.ok){
+  			console.log(jsonResponse)
+  			res.send("Error encountered: \n"+JSON.stringify(jsonResponse)).status(200).end()
+  		}else{
+  			console.log(jsonResponse)
+  			databaseUtils.saveInstallData(jsonResponse)
+  			res.send("Success!")
+  		}
+  	})
+})
+
+app.get('/auth/redirect/wta', (req, res) =>{
+    console.log(req)
+	  var options = {
+  	  uri: process.env.SLACK_URL + '/api/oauth.access?code='+req.query.code+'&client_id='+process.env.CLIENT_ID_WTA+'&client_secret='+process.env.CLIENT_SECRET_WTA+'&redirect_uri='+process.env.REDIRECT_URI_WTA,
 		  method: 'GET'
   	}
   	request(options, (error, response, body) => {
@@ -57,26 +78,33 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
 	var reqBody = req.body;
   console.log(reqBody)
 	var responseURL = reqBody.response_url;
-	if (reqBody.token !=  process.env.APP_VERIFICATION_TOKEN){
+	if (reqBody.token !=  process.env.APP_VERIFICATION_TOKEN && reqBody.token !=process.env.APP_VERIFICATION_TOKEN_WTA){
 	  res.status(403).end("Access forbidden: The token for the slash command doesn't match.");
   }else{
     res.status(200).end();
+    var dbCollection = 'app_installs'
+  
+    if (reqBody.token ==  process.env.APP_VERIFICATION_TOKEN_WTA){
+      dbCollection = 'wta_installs';
+    }
     if (reqBody.command === "/draw-a-card"){
       if (reqBody.text === "help"){
-        utils.sendMessageToSlackURL(responseURL, commandMessageHandler.help(), "");
+        utils.sendMessageToSlackURL(responseURL, commandMessageHandler.help(), "")
       }else{
-        utils.sendMessageToSlackURL(responseURL, commandMessageHandler.usersAndConversationsButtons(reqBody.text), "");
+        utils.sendMessageToSlackURL(responseURL, commandMessageHandler.usersAndConversationsButtons(reqBody.text), "")
       }
-    }else if (reqBody.command === "/block-kit"){
-      console.log(reqBody);
-      return databaseUtils.getToken(reqBody.team_id).then(function(token){
-				utils.openDialog(token, reqBody.trigger_id, "blocks");
+    }else if (reqBody.command === "/block-kit" || reqBody.command === "/block-kit-wta"){
+      console.log(reqBody)
+      console.log("DB COLLECTION!!")
+      console.log(dbCollection)
+      return databaseUtils.getToken(reqBody.team_id, dbCollection).then(function(token){
+				utils.openDialog(token, reqBody.trigger_id, "blocks")
 			})
     }
     else if (reqBody.command === "/dialog" || reqBody.command === "/dialogwta"){
       console.log(reqBody);
-      return databaseUtils.getToken(reqBody.team_id).then(function(token){
-				utils.openDialog(token, reqBody.trigger_id, reqBody.text);
+      return databaseUtils.getToken(reqBody.team_id, dbCollection).then(function(token){
+				utils.openDialog(token, reqBody.trigger_id, reqBody.text)
 			})
     }else if (reqBody.command === "/dialogbutton"){ // not used yet 
       console.log(reqBody);
@@ -93,33 +121,39 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
 	var actionJSONPayload = JSON.parse(req.body.payload) // parse URL encoded payload JSON string
   var callbackID = actionJSONPayload.callback_id
   console.log(actionJSONPayload)
-  if (actionJSONPayload.token !==  process.env.APP_VERIFICATION_TOKEN){
+  var dbCollection = 'app_installs'
+  
+  if (actionJSONPayload.token == process.env.APP_VERIFICATION_TOKEN_WTA){
+    dbCollection = 'wta_installs';
+  }
+  
+  if (actionJSONPayload.token !==  process.env.APP_VERIFICATION_TOKEN && actionJSONPayload.token !==  process.env.APP_VERIFICATION_TOKEN_WTA){
 	  res.status(403).end("Access forbidden: The token for the slash command doesn't match.")
   }
   else if(actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "set_topic"){
     res.send('');
     console.log("set topic here")
-    return databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+    return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
       utils.setTopic(token, actionJSONPayload.message.text, actionJSONPayload.channel.id)
     })
     
   }
   else if (actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "create_channel"){
     res.send('');
-    return databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+    return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
 			utils.openDialog(token, actionJSONPayload.trigger_id, 1)
     })
   }
   else if (actionJSONPayload.type == 'message_action'){
     res.send('');
-    return databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+    return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
 			utils.openDialog(token, actionJSONPayload.trigger_id, 5)
     })
   }
   else if(actionJSONPayload.type == 'dialog_submission' && actionJSONPayload.callback_id == "create_channel"){
     res.send('');
     console.log("create channel here")
-    databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
+    databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
 			utils.createChannel(token, actionJSONPayload.submission.channelName)
     })
   } 
@@ -210,17 +244,23 @@ app.post('/slack/events/', JSONParser, (req, res) =>{
 	var event = req.body.event;
   console.log(event);
 	if (req.body.challenge){
-		if (req.body.token === process.env.APP_VERIFICATION_TOKEN){
+		if (req.body.token === process.env.APP_VERIFICATION_TOKEN || req.body.token === process.env.APP_VERIFICATION_TOKEN_WTA){
 			res.send(req.body.challenge);
 		}else{
 			res.status(403).end();
 		}
 	}else if (event.type === "link_shared"){
+    
+    var dbCollection = 'app_installs'
+  
+    if (req.body.token ==  process.env.APP_VERIFICATION_TOKEN_WTA){
+      dbCollection = 'wta_installs';
+    }
     // rooster.glitch.me links to unfurl some cards because this was in high demand from my millions users 
 		res.status(200).end();
     var randomCard = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
     var unfurlMessage = {"text": "Let\'s shuffle the deck! <@"+event.user+">"};
-    databaseUtils.getToken(req.body.team_id).then(function(token){
+    databaseUtils.getToken(req.body.team_id, dbCollection).then(function(token){
 			utils.handleAppUnfurling(token, event.channel, event.message_ts, event.links, unfurlMessage);
     })
     databaseUtils.getBotToken(req.body.team_id).then(function(token){
