@@ -12,7 +12,7 @@ var utils = {
 
   //basic function to send a message to Slack using the response URL included with requests
 	sendMessageToSlackURL: function(responseURL, messageContent, responseOptions){
-    if (messageContent && messageContent.response_type){
+    if (messageContent){// && messageContent.response_type){
 		  messageContent.response_type = responseOptions.response_type;
     }
     messageContent.replace_original = responseOptions.replace_original;

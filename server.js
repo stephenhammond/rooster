@@ -242,7 +242,7 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
 
 app.post('/slack/events/', JSONParser, (req, res) =>{
 	var event = req.body.event;
-  console.log(event);
+  //console.log(event);
 	if (req.body.challenge){
 		if (req.body.token === process.env.APP_VERIFICATION_TOKEN || req.body.token === process.env.APP_VERIFICATION_TOKEN_WTA){
 			res.send(req.body.challenge);
