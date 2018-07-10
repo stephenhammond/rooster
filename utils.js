@@ -36,7 +36,7 @@ var utils = {
   sendMessageAsBot: function(token, messageBody, channelID){
     var postData = messageBody;
     messageBody.channel = channelID;
-    messageBody.as_user = false;
+    //messageBody.as_user = false;
 
     var postOptions = {
 			uri: process.env.SLACK_URL + "/api/chat.postMessage",

@@ -1,26 +1,115 @@
 // init project and Node modules
-var express = require('express');
-var app = express();
-var request = require('request');
-var bodyParser = require('body-parser');
-var JSONParser = bodyParser.json();
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
-app.use(express.static('public'));
+const express = require('express')
+const app = express()
+const https = require('https')
+const request = require('request')
+const fs = require('fs')
+const bodyParser = require('body-parser')
+const JSONParser = bodyParser.json();
+const urlencodedParser = bodyParser.urlencoded({ extended: false })
+app.use(express.static('public'))
+
+
+// var options = {
+//     host: 'platform-tls-client.slack.com',
+//     port: 443,
+//     method: 'GET'
+// };
+
+// var req = https.request(options, function(res) {
+//     console.log(res.connection.getPeerCertificate());
+// });
+
+// req.end();
+
+// const server = https.createServer({
+//   cert: fs.readFileSync('./cert.crt'),
+//   key: fs.readFileSync('./private.key'),
+//   ca: fs.readFileSync('./chain.pem'),
+//   requestCert: true,
+//   rejectUnauthorized: true,
+// }, app)
+
+
+// app.on('tlsClientError', (err, socket) => {
+//   console.log(`req at ${new Date().toString()}:`)
+//   console.log(`\ttlsClientError: ${err}`)
+// })
+
+// app.on('response', function (res) {
+//   console.log("here")
+//   console.log('peerCertificate:',res.socket.getPeerCertificate());
+//   console.log('authorized:',res.socket.authorized);
+//   console.log('authorizationError:',res.socket.authorizationError);
+// });
+
+
+// app.all('/*', (req, res) => {
+//   const cert = req.socket.getPeerCertificate()
+//   //if (cert && cert.subject) {
+//     console.log(`\tpeer cert CN: ${cert.subject.CN}`)
+//   //}
+//   res.end("ok")
+// })
+
+// const socket = require('tls').connect(443, "platform-tls-client.slack.com", () => {
+//   console.log('client connected',
+//     socket.authorized ? 'authorized' : 'unauthorized');
+//   process.stdin.pipe(socket);
+//   process.stdin.resume();
+// });
+
+
+// var opts = {
+//   domains: [ 'rooster.glitch.me']
+// , email: 'shammond@slack-corp.com'
+// , agreeTos: true                  // Accept Let's Encrypt v2 Agreement
+// , communityMember: false           // Help make Greenlock better by submitting
+//                                   // stats and getting updates
+// };
+
+
+// // ////////////////////
+// // // INIT GREENLOCK //
+// // ////////////////////
+
+// var greenlock = require('greenlock').create({
+//   version: 'draft-11'
+// , server: 'https://acme-v02.api.letsencrypt.org/directory'
+// , configDir: '/tmp/acme/etc'
+// });
+// app.use('/', greenlock.middleware());
+
+// ///////////////////
+// // GET TLS CERTS //
+// ///////////////////
+
+// greenlock.register(opts).then(function (certs) {
+//   console.log("CERTS!");
+//   console.log(certs);
+//   // privkey, cert, chain, expiresAt, issuedAt, subject, altnames
+// }, function (err) {
+//   console.error(err);
+// });
+
+// greenlock.check({ domains: [ 'rooster.glitch.me' ] }).then(function (results) {
+//   console.log(results)
+// });
 
 // files that make app do things
-var utils = require('./utils.js');
-var commandMessageHandler = require('./commandMessageHandler.js');
-var messageMenuOptions = require('./messageMenuOptions.js');
-var databaseUtils = require('./databaseUtils.js');
+var utils = require('./utils.js')
+var commandMessageHandler = require('./commandMessageHandler.js')
+var messageMenuOptions = require('./messageMenuOptions.js')
+var databaseUtils = require('./databaseUtils.js')
 
 
 app.get("/", (request, response) => {
-  response.sendFile(__dirname + '/views/index.html');
-});
+  response.sendFile(__dirname + '/views/index.html')
+})
 
 app.get("/install", (request, response) => {
-  response.sendFile(__dirname + '/views/add_to_slack.html');
-});
+  response.sendFile(__dirname + '/views/add_to_slack.html')
+})
 
 app.get('/auth/redirect', (req, res) =>{
     console.log(req)
@@ -71,21 +160,21 @@ app.post("/card-time", (req, res) => {
   var messageContent = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
   utils.sendMessageAsBot(process.env.BOT_ACCESS_TOKEN, messageContent, "#" + req.query.channel); 
   //res.sendStatus(200);
-});
+})
 
 // route to handle all slash command requests 
 app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
-	var reqBody = req.body;
+	var reqBody = req.body
   console.log(reqBody)
-	var responseURL = reqBody.response_url;
+	var responseURL = reqBody.response_url
 	if (reqBody.token !=  process.env.APP_VERIFICATION_TOKEN && reqBody.token !=process.env.APP_VERIFICATION_TOKEN_WTA){
-	  res.status(403).end("Access forbidden: The token for the slash command doesn't match.");
+	  res.status(403).end("Access forbidden: The token for the slash command doesn't match.")
   }else{
-    res.status(200).end();
+    res.status(200).end()
     var dbCollection = 'app_installs'
   
     if (reqBody.token ==  process.env.APP_VERIFICATION_TOKEN_WTA){
-      dbCollection = 'wta_installs';
+      dbCollection = 'wta_installs'
     }
     if (reqBody.command === "/draw-a-card"){
       if (reqBody.text === "help"){
@@ -102,18 +191,18 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
 			})
     }
     else if (reqBody.command === "/dialog" || reqBody.command === "/dialogwta"){
-      console.log(reqBody);
+      console.log(reqBody)
       return databaseUtils.getToken(reqBody.team_id, dbCollection).then(function(token){
 				utils.openDialog(token, reqBody.trigger_id, reqBody.text)
 			})
     }else if (reqBody.command === "/dialogbutton"){ // not used yet 
-      console.log(reqBody);
+      console.log(reqBody)
       //utils.openDialog(token, reqBody.trigger_id, 5); // hardcoded to dialogOptions type 5 
     
     }
   }
 	
-});
+})
 
 // route to handles all actions from buttons and message menu interactions from user
 app.post('/slack/actions', urlencodedParser, (req, res) =>{
@@ -161,14 +250,22 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     res.send('');
     console.log("create custom block message")
     utils.createBlockMessage(actionJSONPayload.submission).then(function(message){
-			  // databaseUtils.getToken(actionJSONPayload.team.id).then(function(token){
-			  // utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id)
-			  // })
-      var responseOptions = {}; 
-      responseOptions.response_type = "in_channel";
-      responseOptions.replace_original = "true";
-      console.log("HERE!!");
-      utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
+			databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+			  utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id)
+		  })
+    //   var responseOptions = {}; 
+    //   responseOptions.response_type = "in_channel";
+    //   responseOptions.replace_original = "true";
+    //   console.log("HERE!!");
+    //   utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
+    })
+  }else if (actionJSONPayload.type == 'block_actions'){
+    res.send('');
+    var message = {}
+    message.text = "Rooster's server received the following action request:"
+    message.attachments = [{"text": "value: " + actionJSONPayload.actions[0].value}]
+    return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+			utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id)
     })
   }
     
@@ -191,7 +288,7 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
   
   
   else if (actionJSONPayload.type == 'dialog_submission'){
-    res.send('');
+    res.send('')
     var message = {
       "attachments": [
         {
@@ -199,78 +296,78 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
         }
       ]
 		}
-    var responseOptions = {}; 
-    responseOptions.response_type = "in_channel";
-    responseOptions.replace_original = "true";
+    var responseOptions = {}
+    responseOptions.response_type = "in_channel"
+    responseOptions.replace_original = "true"
     utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
     
   }else{
-    var responseOptions = {}; // used as flag for replace, bot, webhook, etc options 
+    var responseOptions = {} // used as flag for replace, bot, webhook, etc options 
     switch (callbackID){  
       case 'destination_selection':
         //utils.openDialog(actionJSONPayload.trigger_id, 5)
-        var menuType = actionJSONPayload.actions[0].value; // "users" or "conversations"
-        var menuToSend = messageMenuOptions.menuSelector(menuType, "send_card");
+        var menuType = actionJSONPayload.actions[0].value // "users" or "conversations"
+        var menuToSend = messageMenuOptions.menuSelector(menuType, "send_card")
         var responseOptions = {}; // used as flag for replace, bot, webhook, etc options
-        responseOptions.response_type = "ephemeral";
-        responseOptions.replace_original = "true";
+        responseOptions.response_type = "ephemeral"
+        responseOptions.replace_original = "true"
         // send ephemeral menu to replace button message 
-        utils.sendMessageToSlackURL(actionJSONPayload.response_url, menuToSend, responseOptions);
-        res.send('');
+        utils.sendMessageToSlackURL(actionJSONPayload.response_url, menuToSend, responseOptions)
+        res.send('')
         break; 
       case 'send_card':
         if (actionJSONPayload.type == "message_action"){
-          var cardDestination = actionJSONPayload.message.user; //
+          var cardDestination = actionJSONPayload.message.user //
         }else{
-          var cardDestination = actionJSONPayload.actions[0].selected_options[0].value;
+          var cardDestination = actionJSONPayload.actions[0].selected_options[0].value
         }
         
-        var messageContent = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
+        var messageContent = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"}
         databaseUtils.getBotToken(actionJSONPayload.team.id).then(function(token){
-		       utils.sendMessageAsBot(token, messageContent, cardDestination);
+		       utils.sendMessageAsBot(token, messageContent, cardDestination)
         })
        
-        res.send('Card sent');
+        res.send('Card sent')
         break;
       default:
-        console.log("shoot");
-        res.status(200).end();                                                                                                                                         
+        console.log("shoot")
+        res.status(200).end()                                                                                                                                       
     }
   }
   
 });
 
 app.post('/slack/events/', JSONParser, (req, res) =>{
-	var event = req.body.event;
+	var event = req.body.event
   //console.log(event);
 	if (req.body.challenge){
 		if (req.body.token === process.env.APP_VERIFICATION_TOKEN || req.body.token === process.env.APP_VERIFICATION_TOKEN_WTA){
-			res.send(req.body.challenge);
+			res.send(req.body.challenge)
 		}else{
-			res.status(403).end();
+			res.status(403).end()
 		}
 	}else if (event.type === "link_shared"){
     
     var dbCollection = 'app_installs'
   
     if (req.body.token ==  process.env.APP_VERIFICATION_TOKEN_WTA){
-      dbCollection = 'wta_installs';
+      dbCollection = 'wta_installs'
     }
     // rooster.glitch.me links to unfurl some cards because this was in high demand from my millions users 
 		res.status(200).end();
-    var randomCard = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"};
-    var unfurlMessage = {"text": "Let\'s shuffle the deck! <@"+event.user+">"};
+    var randomCard = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"}
+    var unfurlMessage = {"text": "Let\'s shuffle the deck! <@"+event.user+">"}
     databaseUtils.getToken(req.body.team_id, dbCollection).then(function(token){
 			utils.handleAppUnfurling(token, event.channel, event.message_ts, event.links, unfurlMessage);
     })
     databaseUtils.getBotToken(req.body.team_id).then(function(token){
-		  utils.sendMessageAsBot(token, randomCard, event.channel);
+		  utils.sendMessageAsBot(token, randomCard, event.channel)
     })
 	}
 	else{
 		res.status(200).end();
 	}
-});
+})
 
 
 app.post('/slack/options-load-point', urlencodedParser, (req, res) =>{
@@ -297,5 +394,5 @@ app.post('/slack/options-load-point', urlencodedParser, (req, res) =>{
 })
 
 app.listen(process.env.PORT || 3000, () => {
-    console.log('Rooster server launched!')
-});
+    console.log(`Rooster server launched on port ${process.env.PORT}`)
+})

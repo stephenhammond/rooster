@@ -12,7 +12,8 @@
     "request": "^2.87.0",
     "promise": "^8.0.1",
     "assert": "^1.4.1",
-    "mongodb": "^3.0.10"
+    "mongodb": "^3.0.10",
+    "greenlock": "^2.3.3"
   },
   "engines": {
     "node": "8.x"
