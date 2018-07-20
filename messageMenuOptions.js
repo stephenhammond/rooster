@@ -622,7 +622,62 @@ var messageMenuOptions = {
 			"mention": {
 				"text": "@po here's your mention, master"
 				
-			}					
+			},
+      "paginationMethods": {
+				"attachments": [
+					{
+						"title": "Methods",
+						"text": "Test pagination",
+						"fallback": "Static Menu - Fallback",
+						"callback_id": "pagination_tests",
+						"color": "#439FE0",
+						"attachment_type": "default",
+						"actions": [
+							{
+								"name": "static_test",
+								"data_source": "static",
+								"text": "Select a method",
+								"type": "select",
+								// "confirm": {
+								// "title": "Are you sure?",
+								// "text": "Wouldn't you prefer Pansy Morgan?",
+								// "ok_text": "Yeah!",
+								// "dismiss_text": "No way"
+								// },
+								"options": [
+                  // 	"confirm": {
+									// "title": "Are you sure?",
+									// "text": "Wouldn't you prefer a little Pansy Morgan action?",
+									// "ok_text": "Yes",
+									// "dismiss_text": "No"
+									// }
+									{
+										"text": "groups.list (no WTA support)",
+										"value": 1
+									},
+                  {
+										"text": "mpim.list (no WTA support)",
+										"value": 2
+									},
+                  {
+										"text": "files.info",
+										"value": 3
+									},
+                  {
+										"text": "reactions.list",
+										"value": 4
+									},
+                  {
+										"text": "stars.list (no WTA support)",
+										"value": 5
+									},
+                  
+								]
+							}
+						]
+					}
+				]
+			}				
 		}
 		return options[input]
 

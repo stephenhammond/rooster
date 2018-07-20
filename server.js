@@ -101,6 +101,8 @@ var utils = require('./utils.js')
 var commandMessageHandler = require('./commandMessageHandler.js')
 var messageMenuOptions = require('./messageMenuOptions.js')
 var databaseUtils = require('./databaseUtils.js')
+var listMethodsHandler = require('./listMethodsHandler.js')
+
 
 
 app.get("/", (request, response) => {
@@ -198,6 +200,16 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
     }else if (reqBody.command === "/dialogbutton"){ // not used yet 
       console.log(reqBody)
       //utils.openDialog(token, reqBody.trigger_id, 5); // hardcoded to dialogOptions type 5 
+    
+    }else if (reqBody.command === "/lists" || reqBody.command === "/listswta"){ // not used yet 
+      console.log(reqBody)
+      //utils.openDialog(token, reqBody.trigger_id, 5); // hardcoded to dialogOptions type 5 
+      var menuToSend = messageMenuOptions.menuSelector("paginationMethods", "")
+      var responseOptions = {}; // used as flag for replace, bot, webhook, etc options
+      responseOptions.response_type = "ephemeral"
+      responseOptions.replace_original = "true"
+      // send ephemeral menu to replace button message 
+      utils.sendMessageToSlackURL(responseURL, menuToSend, responseOptions)
     
     }
   }
@@ -329,6 +341,45 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
        
         res.send('Card sent')
         break;
+      case 'pagination_tests':
+        res.send('')
+        var method = actionJSONPayload.actions[0].selected_options[0].value
+        console.log(actionJSONPayload.actions[0].selected_options[0].value)
+        switch(method) {
+          case '1':
+            method = 'groups.list'
+            break;
+          case '2':
+            method = 'mpim.list'
+            break;
+          case '3':
+            method = 'files.info'
+            break;
+          case '4':
+            method = 'reactions.list'
+            break;
+          case '5':
+            method = 'stars.list'
+            break;
+          default:
+          console.log("shoot")
+          res.status(200).end() 
+        }
+        return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+          listMethodsHandler.callMethodWithLimitAndCursor(token, method, 2, actionJSONPayload)
+        })
+        break; 
+      case 'advance_cursor':
+        res.send('')
+        var cursor = actionJSONPayload.actions[0].value
+        var method = actionJSONPayload.actions[0].name
+        console.log(method)
+        return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+          listMethodsHandler.callMethodWithLimitAndCursor(token, method, 2, actionJSONPayload, cursor)
+        })
+        break;            
+      
+      
       default:
         console.log("shoot")
         res.status(200).end()                                                                                                                                       
