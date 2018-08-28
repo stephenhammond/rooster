@@ -1,8 +1,9 @@
-
 var menuOptions = require('./messageMenuOptions.js').menuSelector("externalOptionsToBeFiltered","").options
+var blockOptionsListForDialog = require('./blockOptions.js').optionsMasterList() 
+
 var dialogOptions = {
 
-	dialogSelector: function(input){		
+	dialogSelector: function(input, stateInput){		
 		var options = {
 			"1": {
 			   
@@ -38,7 +39,8 @@ var dialogOptions = {
 					}],
 			   "title":"A really nice app",
 				 "submit_label":"Create",
-         "notify_on_cancel": true
+         "notify_on_cancel": true,
+         "state": ""
 
 				// ]
 			},
@@ -460,6 +462,66 @@ var dialogOptions = {
 					}
 				]
 			},
+      "state": {
+			   
+			    "callback_id": "simple-dialog-example",
+				  "title": "Rooster Dialog Greatness",
+          "notify_on_cancel": true,
+          "state": stateInput,
+				  "elements": [
+				 	{
+					    	"type": "text", //required
+					   	  "label": "First Name", //required
+					    	"name": "first_name", //required
+				    		"hint": "hint hint",
+				    		"max_length": 4, // default 500
+				    		"min_length": 2,
+				    		"optional": false,
+				    		"placeholder": "enter something here",
+				    		"subtype": "",
+				    		"value": ""
+					},
+					{
+					    	"type": "text", //required
+                "label": "Last Name", // required
+					    	"name": "last_name", // required
+				    		"hint": "hint hint",
+				    		"max_length": 4, // default 500
+				    		"min_length": 2,
+				    		"optional": true,
+				    		"placeholder": "enter something here",
+				    		"subtype": "",
+				    		"value": ""
+					},
+					{
+					    	"type": "text", //required
+					   	  "label": "third field", // required
+					    	"name": "third_field", // required
+				    		"hint": "hint hint",
+				    		"max_length": 4, // default 500
+				    		"min_length": 2,
+				    		"optional": false,
+				    		"placeholder": "enter something here",
+				    		"subtype": "",
+				    		"value": ""
+					},
+          {
+            "name": "external_test",
+            "label": "External Time",
+            "type": "select",
+            "data_source": "external",
+            "min_query_length": 1, // TEST THIS!
+            "selected_options":[
+              {
+                "value": "what",
+                "label": "Preselected Party time"
+              }
+            ]
+                
+          }
+				]
+			},
+      
       
       "blocks": {
 			   
@@ -472,264 +534,40 @@ var dialogOptions = {
                 "type": "select",
                 "name": "block_1",
                 "optional": true,
-                "options": [
-                  {
-                    "label": "Text",
-                    "value": "1"
-                  },
-                  {
-                    "label": "Image",
-                    "value": "2"
-                  },
-                  {
-                    "label": "Context",
-                    "value": "3"
-                  },
-                  {
-                    "label": "Text Group",
-                    "value": "4"
-                  },
-                  {
-                    "label": "Action",
-                    "value": "5"
-                  },
-                  {
-                    "label": "Divider",
-                    "value": "6"
-                  },
-                  {
-                    "label": "Text with Image",
-                    "value": "7"
-                  },
-                  {
-                    "label": "Text with Button",
-                    "value": "8"
-                  },
-                  {
-                    "label": "Text with Select",
-                    "value": "9"
-                  },
-                  {
-                    "label": "Text with Overflow",
-                    "value": "10"
-                  },
-                  {
-                    "label": "Text with Datepicker",
-                    "value": "11"
-                  } 
-                ]
+                "options": blockOptionsListForDialog
             },
             {
                 "label": "Block 2",
                 "type": "select",
                 "name": "block_2",
                 "optional": true,
-                "options": [
-                  {
-                    "label": "Text",
-                    "value": "1"
-                  },
-                  {
-                    "label": "Image",
-                    "value": "2"
-                  },
-                  {
-                    "label": "Context",
-                    "value": "3"
-                  },
-                  {
-                    "label": "Text Group",
-                    "value": "4"
-                  },
-                  {
-                    "label": "Action",
-                    "value": "5"
-                  },
-                  {
-                    "label": "Divider",
-                    "value": "6"
-                  },
-                  {
-                    "label": "Text with Image",
-                    "value": "7"
-                  },
-                  {
-                    "label": "Text with Button",
-                    "value": "8"
-                  },
-                  {
-                    "label": "Text with Select",
-                    "value": "9"
-                  },
-                  {
-                    "label": "Text with Overflow",
-                    "value": "10"
-                  },
-                  {
-                    "label": "Text with Datepicker",
-                    "value": "11"
-                  } 
-                ]
+                "options": blockOptionsListForDialog
             },
             {
               "label": "Block 3",
               "type": "select",
               "name": "block_3",
               "optional": true,
-              "options": [
-                {
-                  "label": "Text",
-                  "value": "1"
-                },
-                {
-                  "label": "Image",
-                  "value": "2"
-                },
-                {
-                  "label": "Context",
-                  "value": "3"
-                },
-                {
-                  "label": "Text Group",
-                  "value": "4"
-                },
-                {
-                  "label": "Action",
-                  "value": "5"
-                },
-                {
-                  "label": "Divider",
-                  "value": "6"
-                },
-                {
-                  "label": "Text with Image",
-                  "value": "7"
-                },
-                {
-                  "label": "Text with Button",
-                  "value": "8"
-                },
-                {
-                  "label": "Text with Select",
-                  "value": "9"
-                },
-                {
-                  "label": "Text with Overflow",
-                  "value": "10"
-                },
-                {
-                  "label": "Text with Datepicker",
-                  "value": "11"
-                } 
-              ]
+              "options": blockOptionsListForDialog
             },
             {
               "label": "Block 4",
               "type": "select",
               "name": "block_4",
               "optional": true,
-              "options": [
-                {
-                  "label": "Text",
-                  "value": "1"
-                },
-                {
-                  "label": "Image",
-                  "value": "2"
-                },
-                {
-                  "label": "Context",
-                  "value": "3"
-                },
-                {
-                  "label": "Text Group",
-                  "value": "4"
-                },
-                {
-                  "label": "Action",
-                  "value": "5"
-                },
-                {
-                  "label": "Divider",
-                  "value": "6"
-                },
-                {
-                  "label": "Text with Image",
-                  "value": "7"
-                },
-                {
-                  "label": "Text with Button",
-                  "value": "8"
-                },
-                {
-                  "label": "Text with Select",
-                  "value": "9"
-                },
-                {
-                  "label": "Text with Overflow",
-                  "value": "10"
-                },
-                {
-                  "label": "Text with Datepicker",
-                  "value": "11"
-                } 
-              ]
+              "options": blockOptionsListForDialog
             },
             {
               "label": "Block 5",
               "type": "select",
               "name": "block_5",
               "optional": true,
-              "options": [
-                {
-                  "label": "Text",
-                  "value": "1"
-                },
-                {
-                  "label": "Image",
-                  "value": "2"
-                },
-                {
-                  "label": "Context",
-                  "value": "3"
-                },
-                {
-                  "label": "Text Group",
-                  "value": "4"
-                },
-                {
-                  "label": "Action",
-                  "value": "5"
-                },
-                {
-                  "label": "Divider",
-                  "value": "6"
-                },
-                {
-                  "label": "Text with Image",
-                  "value": "7"
-                },
-                {
-                  "label": "Text with Button",
-                  "value": "8"
-                },
-                {
-                  "label": "Text with Select",
-                  "value": "9"
-                },
-                {
-                  "label": "Text with Overflow",
-                  "value": "10"
-                },
-                {
-                  "label": "Text with Datepicker",
-                  "value": "11"
-                } 
-              ]
+              "options": blockOptionsListForDialog
             }
           ]
       }
 		}
+    console.log(blockOptionsListForDialog)
 		return options[input]
 
 	} 

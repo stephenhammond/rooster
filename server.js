@@ -7,7 +7,10 @@ const fs = require('fs')
 const bodyParser = require('body-parser')
 const JSONParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
+const fileUpload = require('express-fileupload');
+
 app.use(express.static('public'))
+app.use(fileUpload());
 
 
 // var options = {
@@ -102,6 +105,7 @@ var commandMessageHandler = require('./commandMessageHandler.js')
 var messageMenuOptions = require('./messageMenuOptions.js')
 var databaseUtils = require('./databaseUtils.js')
 var listMethodsHandler = require('./listMethodsHandler.js')
+var filesUtils = require('./filesUtils.js')
 
 
 
@@ -112,6 +116,12 @@ app.get("/", (request, response) => {
 app.get("/install", (request, response) => {
   response.sendFile(__dirname + '/views/add_to_slack.html')
 })
+
+app.get("/files", (request, response) => {
+  response.sendFile(__dirname + '/views/files.html')
+})
+
+
 
 app.get('/auth/redirect', (req, res) =>{
     console.log(req)
@@ -196,6 +206,12 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       console.log(reqBody)
       return databaseUtils.getToken(reqBody.team_id, dbCollection).then(function(token){
 				utils.openDialog(token, reqBody.trigger_id, reqBody.text)
+			})
+      
+    }else if (reqBody.command === "/dialogstate"){
+      console.log(reqBody)
+      return databaseUtils.getToken(reqBody.team_id, dbCollection).then(function(token){
+				utils.openDialogWithState(token, reqBody.trigger_id, reqBody.text)
 			})
     }else if (reqBody.command === "/dialogbutton"){ // not used yet 
       console.log(reqBody)
@@ -301,10 +317,14 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
   
   else if (actionJSONPayload.type == 'dialog_submission'){
     res.send('')
+    var text = "Dialog or Message Action success"
+    if (actionJSONPayload.state){
+      text = actionJSONPayload.state
+    }
     var message = {
       "attachments": [
         {
-          "text": "Dialog or Message Action success"
+          "text": text
         }
       ]
 		}
@@ -313,7 +333,28 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     responseOptions.replace_original = "true"
     utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
     
-  }else{
+  }
+  
+  else if (actionJSONPayload.type == 'dialog_cancellation'){
+    res.send('')
+    var text = "Dialog canceled"
+    if (actionJSONPayload.state){
+      text = actionJSONPayload.state
+    }
+    var message = {
+      "attachments": [
+        {
+          "text": text
+        }
+      ]
+		}
+    var responseOptions = {}
+    responseOptions.response_type = "in_channel"
+    responseOptions.replace_original = "true"
+    utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
+    
+  }
+  else{
     var responseOptions = {} // used as flag for replace, bot, webhook, etc options 
     switch (callbackID){  
       case 'destination_selection':
@@ -444,6 +485,23 @@ app.post('/slack/options-load-point', urlencodedParser, (req, res) =>{
 
 })
 
+app.post('/upload', (req, res) =>{
+  console.log(req.body.teamID)
+  console.log(req.files.uploadFile.mimetype)
+  console.log(req.files.uploadFile)
+  var dbCollection = 'wta_installs'
+  databaseUtils.getToken(req.body.teamID, dbCollection).then(function(token){
+    filesUtils.addFileToSlack(req.files.uploadFile.name, req.files.uploadFile.name.mimetype, token).then(function(fileData){  
+      console.log('HERE:')
+      console.log(fileData)
+      res.status(200)
+      filesUtils.saveNewFile(req.files.uploadFile, fileData)
+    })
+  })
+  
+  
+})
+
 app.listen(process.env.PORT || 3000, () => {
-    console.log(`Rooster server launched on port ${process.env.PORT}`)
+  console.log(`Rooster server launched on port ${process.env.PORT}`)
 })

@@ -14,8 +14,8 @@ var databaseUtils = {
           var db = client.db('bradslavin')
           db.collection(dbCollection).findOne({ team_id: teamID}, function(err, doc) {
             assert.equal(err, null)
-            console.log("Found the following records")
-            console.dir(doc)
+            console.log("Success: Found the token")
+            //console.dir(doc)
             resolve(doc.access_token)   
           })
         })
@@ -98,12 +98,11 @@ var databaseUtils = {
 					    assert.equal(err, null)
 					    console.log("Found the following bot token: ")
 					    console.log(doc.access_token)
-					    
-            			resolve(doc.access_token)
-            			reject(err)
+              resolve(doc.access_token)
+              reject(err)
 					})
 					 client.close(function (err) {
-		             	if(err) throw err
+              if(err) throw err
 		       })
 				})
     		}

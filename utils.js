@@ -93,21 +93,45 @@ var utils = {
 		}
 
 		request.post(
-	          process.env.SLACK_URL + "/api/dialog.open",
-		      {
-		        form: data
-		      },
-		      function (error, response, body) {
-		          if (!error && response.statusCode == 200) {
-		            console.log("Success!")
-		            console.log(body)
-		          } else {
-		            console.log("Fail")
-		            console.log(error) 
-		          }
-		      }
-	   	 )
-	  },
+        process.env.SLACK_URL + "/api/dialog.open",
+      {
+        form: data
+      },
+      function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            console.log("Success!")
+            console.log(body)
+          } else {
+            console.log("Fail")
+            console.log(error) 
+          }
+      }
+   )
+  },
+  openDialogWithState: function(token, triggerID, stateInput){
+		console.log("open dialog!!");
+		var data = {
+      token: token, //process.env.ACCESS_TOKEN,
+		  trigger_id: triggerID,
+		  dialog: JSON.stringify(dialogOptions.dialogSelector("state", stateInput))
+		}
+
+		request.post(
+        process.env.SLACK_URL + "/api/dialog.open",
+      {
+        form: data
+      },
+      function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            console.log("Success!")
+            console.log(body)
+          } else {
+            console.log("Fail")
+            console.log(error) 
+          }
+      }
+   )
+  },
   
   setTopic: function(token, topic, channelID){
 		console.log("open dialog!!");
@@ -215,7 +239,11 @@ var utils = {
 				// )
     
    
+   },
+   createRandomString: function(length) {
+     return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1)
    }
+  
 }
 
 module.exports = utils
