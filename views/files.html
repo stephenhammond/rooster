@@ -13,16 +13,36 @@
   <body>
     <header>
       <h1>
-        Rooster
+        RoosterBox
       </h1>
     </header>
 
     <main>
-      <form ref="uploadForm" id="uploadForm" action="https://rooster.glitch.me/upload" method="post" enctype="multipart/form-data">
+      <form ref="uploadForm" id="uploadForm" action="https://rooster.glitch.me/upload-file" method="post" enctype="multipart/form-data">
         <input type="file" name="uploadFile" />
-        <input type="text" name="teamID" />
-        <input type="submit" value="Upload!" />
-    </form>    
+        <input type="text" placeholder="team ID" name="teamID" />
+        <input type="text" placeholder="channel ID" name="channelID" />
+        <input type="text" placeholder="userID" name="userID" />
+        <input type="text" placeholder="fileType" name="fileType" />
+        <input type="text" placeholder="preview?" name="isPreview" />
+        <input type="submit" value="Upload File" />
+      </form>  
+      <br>
+      <form ref="removeForm" id="removeForm" action="https://rooster.glitch.me/remove-file" method="post" enctype="multipart/form-data">
+        <input type="text" placeholder="team ID" name="teamID" />
+        <input type="text" placeholder="file ID" name="fileID" />
+        <input type="submit" value="Remove File" />
+      </form> 
+      <br>
+      <form ref="updateForm" id="updateForm" action="https://rooster.glitch.me/update-file" method="post" enctype="multipart/form-data">
+        <input type="text" placeholder="team ID" name="teamID" />
+        <input type="text" placeholder="file ID" name="fileID" />
+        <input type="text" placeholder="external ID" name="fileExternalID" />
+        <input type="text" placeholder="external URL" name="fileExternalURL" />
+     <!--   <input type="file" placeholder="preview" name="filePreview" /> -->
+        <input type="text" placeholder="title" name="fileTitle" />
+        <input type="submit" value="Update File" />
+      </form> 
       
       
     </main>

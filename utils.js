@@ -33,10 +33,13 @@ var utils = {
 	},
   
   // send a message using an app bot token 
-  sendMessageAsBot: function(token, messageBody, channelID){
+  sendMessageAsBot: function(token, messageBody, channelID, threadTS){
     var postData = messageBody;
     messageBody.channel = channelID;
     //messageBody.as_user = false;
+    if (threadTS){
+      postData.thread_ts = threadTS
+    }
 
     var postOptions = {
 			uri: process.env.SLACK_URL + "/api/chat.postMessage",
@@ -84,12 +87,42 @@ var utils = {
       }
     )  
 	},
-  openDialog: function(token, triggerID, dialogSelection){
+  handleFileUnfurling: function(token, channel, ts, links, messageContent){
+   return new Promise(
+      function (resolve, reject) {
+        var data = {
+          "channel": channel,
+          "ts": ts,
+          "token": token
+        }
+        var unfurls = {}
+        unfurls[links[0].url] = messageContent
+        data["unfurls"] = JSON.stringify(unfurls)
+        request.post(
+          process.env.SLACK_URL + "/api/chat.unfurl",
+          {
+            form: data
+          },
+          function (err, response, body) {
+            if(err) throw err
+            console.log(body)
+          
+            var promiseResolve = {
+              "response": body,
+              "postData": data
+            }
+            resolve(promiseResolve)
+          }
+        )  
+      })
+	},
+  
+  openDialog: function(token, triggerID, dialogSelection, dialogState){
 		console.log("open dialog!!");
 		var data = {
       token: token, //process.env.ACCESS_TOKEN,
 		  trigger_id: triggerID,
-		  dialog: JSON.stringify(dialogOptions.dialogSelector(dialogSelection))
+		  dialog: JSON.stringify(dialogOptions.dialogSelector(dialogSelection, dialogState))
 		}
 
 		request.post(
@@ -191,8 +224,48 @@ var utils = {
       }
       return results
     },
-   createBlockMessage: function(blockSelections){
+   createBlockMessage: function(blockSelections, randomFlag){
      console.log("Create block message util")
+     console.log(blockSelections)
+     function getRandomArbitrary(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+     }
+     if (randomFlag){
+        blockSelections = {
+          block_1: getRandomArbitrary(1,25),
+          block_2: getRandomArbitrary(1,25),
+          block_3: getRandomArbitrary(1,25),
+          block_4: getRandomArbitrary(1,25),
+          block_5: getRandomArbitrary(1,25),
+          block_6: getRandomArbitrary(1,25),
+          block_7: getRandomArbitrary(1,25),
+          block_8: getRandomArbitrary(1,25),
+          block_9: getRandomArbitrary(1,25),
+          block_10: getRandomArbitrary(1,25)
+        }
+//          blockSelections ={ block_1: 22,
+
+//             block_2: 19,
+
+//             block_3: 4,
+
+//             block_4: 4,
+
+//             block_5: 6,
+
+//             block_6: 21,
+
+//             block_7: 19,
+
+//             block_8: 1,
+
+//             block_9: 1,
+
+//             block_10: 3 
+//          }
+       }
+       
+     
      console.log(blockSelections)
      return new Promise(
 				function (resolve, reject) {
@@ -201,6 +274,7 @@ var utils = {
           for (var propName in blockSelections) { 
             if (blockSelections[propName] !== null) {
               blocksArray.push(blockOptions.blockSelector(blockSelections[propName]));
+              //blocksArray.push(blockOptions.blockSelector(blockSelections[propName]));
             }
             
           }
@@ -242,6 +316,31 @@ var utils = {
    },
    createRandomString: function(length) {
      return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1)
+   },
+  
+   oauthAccessRefresh: function(refreshToken){
+     // console.log(req)
+     return new Promise(
+       function (resolve, reject) {
+          var options = {
+            uri: process.env.SLACK_URL + '/api/oauth.access?grant_type=refresh_token&client_id='+process.env.CLIENT_ID_WTA+'&client_secret='+process.env.CLIENT_SECRET_WTA+'&refresh_token='+refreshToken,
+            method: 'GET'
+          }
+          request(options, (error, response, body) => {
+            var jsonResponse = JSON.parse(body)
+            //console.log(jsonResponse)
+            if (!jsonResponse.ok){
+              reject(jsonResponse)
+              //res.send("Error encountered: \n"+JSON.stringify(jsonResponse)).status(200).end()
+            }else{
+              console.log("Refresh response:")
+              console.log(jsonResponse)
+              resolve(jsonResponse)
+              //databaseUtils.saveInstallData(jsonResponse)
+              //res.send("Success!")
+            }
+          })
+       })
    }
   
 }

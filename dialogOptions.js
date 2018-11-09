@@ -528,6 +528,7 @@ var dialogOptions = {
 			    "callback_id": "blocks",
 				  "title": "Create Block Kit Message",
           "notify_on_cancel": true,
+          "state": stateInput,
 				  "elements": [
             {
                 "label": "Block 1",
@@ -563,8 +564,103 @@ var dialogOptions = {
               "name": "block_5",
               "optional": true,
               "options": blockOptionsListForDialog
-            }
+            },
+            //  {
+            //     "label": "Block 6",
+            //     "type": "select",
+            //     "name": "block_6",
+            //     "optional": true,
+            //     "options": blockOptionsListForDialog
+            // },
+            // {
+            //   "label": "Block 7",
+            //   "type": "select",
+            //   "name": "block_7",
+            //   "optional": true,
+            //   "options": blockOptionsListForDialog
+            // },
+            // {
+            //   "label": "Block 8",
+            //   "type": "select",
+            //   "name": "block_8",
+            //   "optional": true,
+            //   "options": blockOptionsListForDialog
+            // },
+            // {
+            //   "label": "Block 9",
+            //   "type": "select",
+            //   "name": "block_9",
+            //   "optional": true,
+            //   "options": blockOptionsListForDialog
+            // }
           ]
+      },
+      "filesList": {
+			   
+			    "callback_id": "filesListDialog",
+				  "title": "Search Rooster Files",
+				  "elements": [
+          {
+					    	"type": "text", //required
+					   	  "label": "Channel", //required
+					    	"name": "channelIDSearch", //required
+				    	//	"hint": "hint hint",
+				    		//"max_length": 4, // default 500
+				    		//"min_length": 2,
+				    		"optional": true,
+				    		"placeholder": "enter channel ID",
+				    		"subtype": "",
+				    		"value": "" 
+					},
+				 	{
+					    	"type": "text", //required
+					   	  "label": "TS Start", //required
+					    	"name": "tsStart", //required
+				    	//	"hint": "hint hint",
+				    		//"max_length": 4, // default 500
+				    		//"min_length": 2,
+				    		"optional": true,
+				    		"placeholder": "enter TS in seconds",
+				    		"subtype": "",
+				    		"value": new Date() / 1000 | 0 // current time in seconds 
+					},
+					{
+					    	"type": "text", //required
+                "label": "TS End", // required
+					    	"name": "tsEnd", // required
+				    	//	"hint": "hint hint",
+				    		//"max_length": 4, // default 500
+				    		//"min_length": 2,
+				    		"optional": true,
+				    		"placeholder": "enter TS in seconds",
+				    		"subtype": "",
+				    		"value": new Date() / 1000 | 0 // current time in seconds
+					},
+					{
+					    	"type": "text", //required
+					   	  "label": "Page", // required
+					    	"name": "listPage", // required
+				    		//"hint": "hint hint",
+				    	//	"max_length": 4, // default 500
+				    	//	"min_length": 2,
+				    		"optional": true,
+				    		"placeholder": "enter page here",
+				    		"subtype": "",
+				    		"value": ""
+					},
+					{
+					    	"type": "text", //required
+					   	  "label": "Count", // required
+					    	"name": "listCount", // required
+				    		//"hint": "hint hint",
+				    	//	"max_length": 4, // default 500
+				    	//	"min_length": 2,
+				    		"optional": true,
+				    		"placeholder": "enter count here",
+				    		"subtype": "",
+				    		"value": ""
+					}
+        ]
       }
 		}
     console.log(blockOptionsListForDialog)

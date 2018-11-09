@@ -3,112 +3,120 @@ var blockOptions = {
   optionsMasterList: function(){
     var optionsList = 
       [
+        {
+          "label": "Section with text markdown",
+          "value": "1"
+        },
+        {
+          "label": "Section with plaintext",
+          "value": "1a"
+        },
+        {
+          "label": "Section with fields",
+          "value": "1b"
+        },
+        {
+          "label": "Image",
+          "value": "2"
+        },
+        {
+          "label": "Context",
+          "value": "3"
+        },
+        {
+          "label": "Action buttons",
+          "value": "4"
+        },
+        {
+          "label": "Divider",
+          "value": "5"
+        },
+        {
+          "label": "Section with Image",
+          "value": "6"
+        },
+        {
+          "label": "Section with Button",
+          "value": "7"
+        },
+        {
+          "label": "Section with Select",
+          "value": "8"
+        },
+        {
+          "label": "Section with Overflow",
+          "value": "9"
+        },
+        {
+          "label": "Section with Datepicker - 1990-04-28 preselected",
+          "value": "10"
+        },
+        //{
+         // "label": "Expandable",
+         // "value": "11"
+        //},
+        {
+          "label": "Datepicker, overflow and button",
+          "value": "12"
+        },
+        {
+          "label": "Static Select with button",
+          "value": "12a"
+        },
+        {
+          "label": "Section with users select - no preselected",
+          "value": "13"
+        },
+        {
+          "label": "Section with channels select - no preselected",
+          "value": "14"
+        },
+        {
+          "label": "Section with conversations select - no preselected",
+          "value": "15"
+        },
+        {
+          "label": "Action users select - no preselected",
+          "value": "16"
+        },
+        {
+          "label": "Action channels select - no preselected",
+          "value": "17"
+        },
+        {
+          "label": "Action conversations select - no preselected",
+          "value": "18"
+        },
           {
-            "label": "Text",
-            "value": "1"
-          },
-          {
-            "label": "Image",
-            "value": "2"
-          },
-          {
-            "label": "Context",
-            "value": "3"
-          },
-          // {
-          //   "label": "Text Group",
-          //   "value": "4"
-          // },
-          {
-            "label": "Action",
-            "value": "5"
-          },
-          {
-            "label": "Divider",
-            "value": "6"
-          },
-          {
-            "label": "Text with Image",
-            "value": "7"
-          },
-          {
-            "label": "Text with Button",
-            "value": "8"
-          },
-          {
-            "label": "Text with Select",
-            "value": "9"
-          },
-          {
-            "label": "Text with Overflow (includes option with link)",
-            "value": "10"
-          },
-          {
-            "label": "Text with Datepicker",
-            "value": "11"
-          },
-          {
-            "label": "Expandable",
-            "value": "12"
-          },
-          {
-            "label": "Datepicker - Aug 1, 2018 preselected",
-            "value": "13"
-          },
-          {
-            "label": "Text with users select - no preselected",
-            "value": "14"
-          },
-          {
-            "label": "Text with channels select - no preselected",
-            "value": "15"
-          },
-          {
-            "label": "Text with conversations select - no preselected",
-            "value": "16"
-          },
-          {
-            "label": "Action users select - no preselected",
-            "value": "17"
-          },
-          {
-            "label": "Action channels select - no preselected",
-            "value": "18"
-          },
-          {
-            "label": "Action conversations select - no preselected",
-            "value": "19"
-          },
-            {
-            "label": "Text with users select - user Rooster preselected",
-            "value": "20"
-          },
-          {
-            "label": "Text with channels select - #general preselected (test.slack.com only)",
-            "value": "21"
-          },
-          {
-            "label": "Text with conversations select - #random preselected (test.slack.com only)",
-            "value": "22"
-          },
-          {
-            "label": "Action users select - user Rooster preselected",
-            "value": "23"
-          },
-          {
-            "label": "Action channels select - #general preselected (test.slack.com only)",
-            "value": "24"
-          },
-          {
-            "label": "Action conversations select - #random preselected (test.slack.com only)",
-            "value": "25"
-          },
-          {
-            "label": "Link button",
-            "value": "26"
-          },
-        
-        ]
+          "label": "Section w/ users select - user Rooster preselected",
+          "value": "19"
+        },
+        {
+          "label": "Section w/ channels select - #general preselected (test.slack.com only)",
+          "value": "20"
+        },
+        {
+          "label": "Section w/ conversations select - #random preselected (test.slack.com only)",
+          "value": "21"
+        },
+        {
+          "label": "Action users select - user Rooster preselected",
+          "value": "22"
+        },
+        {
+          "label": "Action channels select - #general preselected (test.slack.com only)",
+          "value": "23"
+        },
+        {
+          "label": "Action conversations select - #random preselected (test.slack.com only)",
+          "value": "24"
+        },
+        {
+          "label": "Link button",
+          "value": "25"
+        },
+
+      ]
    
     return optionsList
   },
@@ -117,364 +125,689 @@ var blockOptions = {
     
     var options = {
       "1": {
-        "type": "text",
-        "text": "Welcome to the :star:*Best App*:star:! It is the Slack app you're going to write using Block Kit!"
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Markdown samples: *bold* _italic_ ~strikethrough~ `code` :ghost: *this is bold*, and ~this is crossed out~, and <https://google.com|this is a link>, dated <!date^1392734382^Posted {date_num} {time_secs}>"
+        }
+      },
+      "1a": {
+        "type": "section",
+        "text": {
+          "type": "plaintext",
+          "text": "Plaintext: *bold* _italic_ ~strikethrough~ `code`"
+        }
+      },
+       "1b": {
+        "type": "section",
+        "block_id": "section789",
+        "fields": [
+          {
+            "type": "plaintext",
+            "text": "*this is plaintext text*"
+          },
+          {
+            "type": "plaintext",
+            "text": "*this is plaintext text*"
+          },
+          {
+            "type": "plaintext",
+            "text": "*this is plaintext text*"
+          },
+          {
+            "type": "plaintext",
+            "text": "*this is plaintext text*"
+          },
+          {
+            "type": "plaintext",
+            "text": "*this is plaintext text*"
+          }
+        ]
       },
       "2": {
-        "type": "image",
-        "title": "Sample Title",
-        "block_id": "image1",
-        "image_url": "http://images.mentalfloss.com/sites/default/files/styles/mf_image_16x9/public/quotesprimary.png?itok=uxSe2My7&resize=1100x619",
-        "alt_text": "Bob Ross picture"
+       	"type": "image",
+        "title": {
+          "type": "plaintext",
+          "text": "Catch That Baby"
+        },
+        "block_id": "image123",
+        "image_url": "https://images.pexels.com/photos/1166990/pexels-photo-1166990.jpeg",
+        "alt_text": "baby_catchin"
       },
       "3": {
         "type": "context",
-        "block_id": "context_123",
+        "block_id": "context456",
         "elements": [
           {
-            "type": "image",
-            "image_url": "https://image.freepik.com/free-photo/red-drawing-pin_1156-445.jpg",
-            "alt_text": "images"
+            "type": "mrkdwn",
+            "text": "*This* is :smile: markdown"
           },
           {
-            "type": "text",
-            "text": "Location: Dogpatch"
+            "type": "image",
+            "image_url": "https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg",
+            "alt_text": "cute cat"
           }
         ]
       },
-      // "4":{
-      //   "type": "text_group",
-      //   "block_id": "text_collection456",
-      //   "group": [
-      //     {
-      //       "type": "text",
-      //       "text": "Number of La Croix's consumed on Floor 7 on Monday:"
-      //     },
-      //     {
-      //       "type": "text",
-      //       "text": "*187*"
-      //     },
-      //     {
-      //       "type": "text",
-      //       "text": "Number of lines of code committed by Floor 7 on Monday:"
-      //     },
-      //     {
-      //       "type": "text",
-      //       "text": "*1047*"
-      //     }
-      //   ]
-      //},
-      "5":	{
+      "4":	{
         "type": "actions",
-        "block_id": "action_123",
+        "block_id": "actionblock123",
         "elements": [
           {
             "type": "button",
-            "text": "Click Me",
-            "value": "click_me",
-            "action_id": "click_me_action_id"
+            "text": {
+              "type": "plaintext",
+              "text": "red"
+            },
+            "value": "red",
+            "action_id": "button"
           },
           {
-            "type": "datepicker",
-            "placeholder": "choose a date",// waiting for PR
-            "action_id": "date_picker",
-            "selected_date": "2018-08-01"
+            "type": "button",
+            "text": {
+              "type": "plaintext",
+              "text": "blue"
+            },
+            "value": "blue",
+            "action_id": "button2"
           },
           {
-            "type": "overflow",
-            "action_id": "overflow_action_id",
-            "options": [
-              {
-                "text": "Raindrops on roses",
-                "value": "raindrops"
-              },
-              {
-                "text": "Whiskers on kittens",
-                "value": "whiskers"
-              },
-              {
-                "text": "Bright copper kettles",
-                "value": "kettles"
-              },
-              {
-                "text": "Warm woolen mittens",
-                "value": "mittens"
-              }
-            ]
+            "type": "button",
+            "text": {
+              "type": "plaintext",
+              "text": "green"
+            },
+            "value": "green",
+            "action_id": "button3"
           }
         ]
       },
-      "6":{
+      "5":{
         "type": "divider"
       },
-      "7":{
-        "block_id": "text_image123",
-        "type": "text",
-        "text": "<https://google.com|*Haunted House Hotel*> \n :star: \n $20 charge for troll under the stairs \n Rated: 2.4 Horrible",
+      "6":{
+        "type": "section",
+        "block_id": "section567",
+        "text": {
+          "type": "mrkdwn",
+          "text": "This is a section block with an accessory image."
+        },
         "accessory": {
           "type": "image",
-          "image_url": "https://is5-ssl.mzstatic.com/image/thumb/Purple3/v4/d3/72/5c/d3725c8f-c642-5d69-1904-aa36e4297885/source/256x256bb.jpg",
-          "alt_text": "Haunted hotel image"
+          "image_url": "https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg",
+          "alt_text": "cute cat"
+        }
+      },
+      "7":{
+        "type": "section",
+        "block_id": "section234",
+        "text": {
+          "type": "mrkdwn",
+          "text": "This is a section block with a button."
+        },
+        "accessory": {
+          "type": "button",
+          "text": {
+            "type": "plaintext",
+            "text": "Click Me"
+          },
+          "value": "click_me_123",
+          "action_id": "button"
         }
       },
       "8":{
-        "type": "text",
-        "text": "*Incident 583* - SEVERE WARNING: nuclear core is melting down.",
-        "block_id": "text123",
+       "type": "section",
+        "block_id": "section678",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Pick an item from the dropdown list"
+        },
         "accessory": {
-          "type": "button",
-          "text": "Sound Alarm",
-          "action_id": "sound_alarm",
-          "value": "sound_alarm"
+          "action_id": "text1234",
+          "type": "static_select",
+          "placeholder": {
+            "type": "plaintext",
+            "text": "Select an item"
+          },
+          "options": [
+            {
+              "text": {
+                "type": "plaintext",
+                "text": "0 - *this is plaintext text*"
+              },
+              "value": "value-0"
+            },
+            {
+              "text": {
+                "type": "plaintext",
+                "text": "1 - *this is plaintext text*"
+              },
+              "value": "value-1"
+            },
+            {
+              "text": {
+                "type": "plaintext",
+                "text": "2 - *this is plaintext text*"
+              },
+              "value": "value-2"
+            }
+          ]
         }
       },
       "9":{
-        "type": "text",
-        "text": "*Jammie* is requesting an expense approval of *$3,500* for *the Platform Team's Taylor Swift Concert offsite.*",
-        "block_id": "text_select789",
+        "type": "section",
+        "block_id": "section 890 asdfasdf",
+        "text": {
+          "type": "mrkdwn",
+          "text": "This is a section block with an overflow menu."
+        },
         "accessory": {
-          "type": "static_select",
-          "action_id": "select_action_id",
-          "placeholder": "Select an option",
+          "type": "overflow",
           "options": [
             {
-              "text": "Approve",
-              "value": "Approve"
+              "text": {
+                "type": "plaintext",
+                "text": "*this is plaintext text*"
+              },
+              "value": "value-0"
             },
             {
-              "text": "Deny",
-              "value": "Approve"
+              "text": {
+                "type": "plaintext",
+                "text": "*this is plaintext text*"
+              },
+              "value": "value-1"
+            },
+            {
+              "text": {
+                "type": "plaintext",
+                "text": "*this is plaintext text*"
+              },
+              "value": "value-2"
+            },
+            {
+              "text": {
+                "type": "plaintext",
+                "text": "*this is plaintext text*"
+              },
+              "value": "value-3"
+            },
+            {
+              "text": {
+                "type": "plaintext",
+                "text": "*this is plaintext text*"
+              },
+              "value": "value-4"
             }
-          ]
+          ],
+          "action_id": "overflowasdfasdfasdf"
         }
       },
       "10":{
-        "type": "text",
-        "text": "Issue ABC-123 has been resolved.",
-        "block_id": "text_overflow456",
-        "accessory": {
-          "type": "overflow",
-          "action_id": "resolved_issue",
-          "options": [
-            {
-              "text": "Go to Google",
-              "value": "google",
-              "url": "https://www.google.com/"
-              
-            },
-            {
-              "text": "Re-open ticket",
-              "value": "open"
-            },
-            {
-              "text": "Send this ticket to...",
-              "value": "send"
-            }
-          ]
-        }
-      },
-      "11":{
-        "type": "text",
-        "text": "*Sally* has requested you set the deadline for the Nano launch project",
-        "block_id": "text_datepicker123",
+        "type": "section",
+        "block_id": "section1234",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Pick a date for the deadline."
+        },
         "accessory": {
           "type": "datepicker",
-          "action_id": "launch_project_date",
-          //"selected_date": "2018-08-01"
+          "action_id": "datepicker123asdfasdfasdcghj",
+          "initial_date": "1990-04-28",
+          "placeholder": {
+            "type": "plaintext",
+            "text": "Select a date"
+          }
         }
       },
-      "12":{
-        "type": "expandable",
-        "blocks": [
-          {
-            "type": "action",
-            "block_id": "action_123",
-            "elements": [
-              {
-                "type": "button",
-                "text": "Click Me",
-                "value": "click_me",
-                "action_id": "click_me_action_id"
-              },
-              {
-                "type": "datepicker",
-                "placeholder": "choose a date",
-                "action_id": "date_picker"
-              },
-              {
-                "type": "overflow",
-                "action_id": "overflow_action_id",
-                "options": [
-                  {
-                    "text": "Raindrops on roses",
-                    "value": "raindrops"
-                  },
-                  {
-                    "text": "Whiskers on kittens",
-                    "value": "whiskers"
-                  },
-                  {
-                    "text": "Bright copper kettles",
-                    "value": "kettles"
-                  },
-                  {
-                    "text": "Warm woolen mittens",
-                    "value": "mittens"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "13":	{
+      //"11":{
+    //    "type": "text",
+    //    "text": "placeholder for expandable type"
+    //    },
+      //   "type": "expandable",
+      //   "blocks": [
+      //     {
+      //       "type": "action",
+      //       "block_id": "action_123",
+      //       "elements": [
+      //         {
+      //           "type": "button",
+      //           "text": "Click Me",
+      //           "value": "click_me",
+      //           "action_id": "click_me_action_id"
+      //         },
+      //         {
+      //           "type": "datepicker",
+      //           "placeholder": "choose a date",
+      //           "action_id": "date_picker"
+      //         },
+      //         {
+      //           "type": "overflow",
+      //           "action_id": "overflow_action_id",
+      //           "options": [
+      //             {
+      //               "text": "Raindrops on roses",
+      //               "value": "raindrops"
+      //             },
+      //             {
+      //               "text": "Whiskers on kittens",
+      //               "value": "whiskers"
+      //             },
+      //             {
+      //               "text": "Bright copper kettles",
+      //               "value": "kettles"
+      //             },
+      //             {
+      //               "text": "Warm woolen mittens",
+      //               "value": "mittens"
+      //             }
+      //           ]
+      //         }
+      //       ]
+      //     }
+      //   ]
+      // },
+      "12":	{
         "type": "actions",
-        "block_id": "action_123",
+        "block_id": "actionblock789dfghjdfgj",
         "elements": [
           {
             "type": "datepicker",
-            "placeholder": "choose a date",// waiting for PR
-            "action_id": "date_picker",
-            "selected_date": "2018-08-01"
+            "action_id": "datepicker123asdfasdfasdfh",
+            //"initial_date": "1990-04-28",
+            "placeholder": {
+              "type": "plaintext",
+              "text": "Select a date"
+            }
+          },
+          {
+            "type": "overflow",
+            "options": [
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "*this is plaintext text*"
+                },
+                "value": "value-0"
+              },
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "*this is plaintext text*"
+                },
+                "value": "value-1"
+              },
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "*this is plaintext text*"
+                },
+                "value": "value-2"
+              },
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "*this is plaintext text*"
+                },
+                "value": "value-3"
+              },
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "*this is plaintext text*"
+                },
+                "value": "value-4"
+              }
+            ],
+            "action_id": "overflowasdfasdfasdf"
+          },
+          {
+            "type": "button",
+            "text": {
+              "type": "plaintext",
+              "text": "Click Me"
+            },
+            "value": "click_me_123",
+            "action_id": "buttonfghjseadraer"
           }
         ]
       },
-      "14":{
-        "type": "text",
-        "text": "Text with users select menu with no preselected user",
-        "block_id": "text_selectasdasd",
+      "12a": {
+        "type": "actions",
+        "block_id": "actions1fdgji",
+        "elements": [
+          {
+            "type": "static_select",
+            "placeholder":{
+              "type": "plaintext",
+              "text": "Which witch is the witchiest witch?"
+            },
+            "action_id": "select_2asdfasdf",
+            "options": [
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "Matilda"
+                },
+                "value": "matilda"
+              },
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "Glinda"
+                },
+                "value": "glinda"
+              },
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "Granny Weatherwax"
+                },
+                "value": "grannyWeatherwax"
+              },
+              {
+                "text": {
+                  "type": "plaintext",
+                  "text": "Hermione"
+                },
+                "value": "hermione"
+              }
+            ]
+          },
+          {
+            "type": "button",
+            "text": {
+              "type": "plaintext",
+              "text": "Cancel"
+            },
+            "value": "cancel",
+            "action_id": "button_1fghjfghj"
+          }
+        ]
+      },
+      "13":{
+        "type": "section",
+        "block_id": "section678asdfasdfasdf",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Pick a *user* from the dropdown list"
+        },
         "accessory": {
+          "action_id": "textadfhfghj",
           "type": "users_select",
-          "action_id": "select_action_id"
+          "placeholder": {
+            "type": "plaintext",
+            "text": "Select a user"
+          }
+        }
+      },
+      "14":{
+        "type": "section",
+        "block_id": "section678asdfasdf",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Pick a *channel* from the dropdown list"
+        },
+        "accessory": {
+          "action_id": "text1adfgadfg",
+          "type": "channels_select",
+          "placeholder": {
+            "type": "plaintext",
+            "text": "Select a channel"
+          }
         }
       },
       "15":{
-        "type": "text",
-        "text": "Text with channels select menu with no preselected channel",
-        "block_id": "text_selectasdaasdsd",
+        "type": "section",
+        "block_id": "section678sdfgsdfg",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Pick a *conversation* from the dropdown list"
+      },
         "accessory": {
-          "type": "channels_select",
-          "action_id": "select_action_id"
+          "action_id": "text2345ghksdf",
+          "type": "conversations_selectfghjfghj",
+          "placeholder": {
+            "type": "plaintext",
+            "text": "Select a conversation"
+          }
         }
       },
-      "16":{
-        "type": "text",
-        "text": "Text with conversations select menu with no preselected conversation",
-        "block_id": "text_selectasdaasdsd",
-        "accessory": {
-          "type": "conversations_select",
-          "action_id": "select_action_id"
-        }
-      },
-      "17":	{
+      "16":	{
         "type": "actions",
-        "block_id": "action_123",
+        "block_id": "action_123asdfasdf",
         "elements": [
           {
             "type": "users_select",
-            "action_id": "users_select",
-        
+            "action_id": "users_selectfghjubas",
+            "placeholder": {
+              "type": "plaintext",
+              "text": "Select a user"
+            }
+          }
+        ]
+      },
+      "17":	{
+        "type": "actions",
+        "block_id": "action_123asdgadhfasfdg",
+        "elements": [
+          {
+            "type": "channels_select",
+            "action_id": "channels_selectfghjertxvhj",
+            "placeholder": {
+              "type": "plaintext",
+              "text": "Select a channel"
+            }
           }
         ]
       },
       "18":	{
         "type": "actions",
-        "block_id": "action_123",
-        "elements": [
-          {
-            "type": "channels_select",
-            "action_id": "channels_select",
-        
-          }
-        ]
-      },
-      "19":	{
-        "type": "actions",
-        "block_id": "action_123",
+        "block_id": "action_123asdgasdf",
         "elements": [
           {
             "type": "conversations_select",
-            "action_id": "conversations_select",
-        
+            "action_id": "conversations_selectfghjffasdar",
+            "placeholder": {
+              "type": "plaintext",
+              "text": "Select a conversation"
+            }
           }
         ]
       },
-      "20":{
-        "type": "text",
-        "text": "Text with users select menu with preselected user",
-        "block_id": "text_selectasdasd",
+      "19":{
+        "type": "section",
+        "block_id": "users2",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Pick a *user* from the dropdown list"
+        },
         "accessory": {
+          "action_id": "text1234asdfastw",
           "type": "users_select",
-          "action_id": "select_action_id",
-          "selected_user": "UAYPH6EAE"
+          "initial_user": "UAYPH6EAE",
+          "placeholder": {
+            "type": "plaintext",
+            "text": "Select a user"
+          }
+        }
+      },
+      "20":{
+        "type": "section",
+        "block_id": "channels2thywdfasf",
+        "text": {
+          "type": "mrkdwn",
+          "text": "Pick a *channel* from the dropdown list"
+        },
+        "accessory": {
+          "action_id": "text1234asdgafhasd",
+          "type": "channels_select",
+          "initial_channel": "C024BE7TA",
+          "placeholder": {
+            "type": "plaintext",
+            "text": "Select a channel"
+          }
         }
       },
       "21":{
-        "type": "text",
-        "text": "Text with channels select menu with reseplected channel",
-        "block_id": "text_selectasdaasdsd",
+        "type": "section",
+        "block_id": "convos2dfhsdfassd",
+        "text": {
+            "type": "mrkdwn",
+            "text": "Pick a *conversation* from the dropdown list"
+        },
         "accessory": {
-          "type": "channels_select",
-          "action_id": "select_action_id",
-          "selected_channel": "C024BE7TA" // #general on test.slack.com
-        }
-      },
-      "22":{
-        "type": "text",
-        "text": "Text with conversations select menu with preselected conversation",
-        "block_id": "text_selectasdaasdsd",
-        "accessory": {
+          "action_id": "text1234asdgaesdhhjadfg",
           "type": "conversations_select",
-          "action_id": "select_action_id",
-          "selected_conversation": "C024BENFU" // #random on test.slack.com
+          "initial_conversation": "C024BENFU",
+          "placeholder": {
+            "type": "plaintext",
+            "text": "Select a conversation"
+          }
         }
       },
-      "23":	{
+      "22":	{
         "type": "actions",
-        "block_id": "action_123",
+        "block_id": "action_123asdsdgadfha",
         "elements": [
           {
             "type": "users_select",
-            "action_id": "users_select",
-            "selected_user": "UAYPH6EAE"  
+            "action_id": "users_selectasdfasdga",
+            "initial_user": "UAYPH6EAE",
+            "placeholder": {
+              "type": "plaintext",
+              "text": "Select a conversation"
+            }
+          }
+        ]
+      },
+      "23":	{
+        "type": "actions",
+        "block_id": "action_123gjhwer",
+        "elements": [
+          {
+            "type": "channels_select",
+            "action_id": "channels_selectasdfasdf",
+            "initial_channel": "C024BE7TA", // #general on test.slack.com
+            "placeholder": {
+              "type": "plaintext",
+              "text": "Select a channel"
+            }
           }
         ]
       },
       "24":	{
         "type": "actions",
-        "block_id": "action_123",
+        "block_id": "action_123fghjvcber",
         "elements": [
           {
-            "type": "channels_select",
-            "action_id": "channels_select",
-            "selected_channel": "C024BE7TA" // #general on test.slack.com
+            "type": "conversations_select",
+            "action_id": "conversations_selectsdgsdferja",
+            "initial_conversation": "C024BENFU", // #random on test.slack.com
+            "placeholder": {
+              "type": "plaintext",
+              "text": "Select a conversation"
+            }
           }
         ]
       },
       "25":	{
         "type": "actions",
-        "block_id": "action_123",
-        "elements": [
-          {
-            "type": "conversations_select",
-            "action_id": "conversations_select",
-            "selected_conversation": "C024BENFU" // #random on test.slack.com
-          }
-        ]
-      },
-      "26":	{
-        "type": "actions",
-        "block_id": "action_123",
+        "block_id": "actions1rtycxbvsadf",
         "elements": [
           {
             "type": "button",
-            "text": "Google",
-            "value": "google",
-            "action_id": "click_me_action_id",
-            "url": "https://www.google.ca/"
+            "text": {
+              "type": "plaintext",
+              "text": "The Google"
+            },
+            "url": "https://www.google.com/"
           }
         ]
-      }  
+      },
+      "26":{
+        "type": "text",
+        "text": "select a conversation",
+        "block_id": "filesearch_conversations",
+        "accessory": {
+          "type": "conversations_select",
+          "action_id": "filesearch_conversations"
+        }
+      },
+      "27":{
+        "type": "text",
+        "text": "Count",
+        "block_id": "filesearch_count",
+        "accessory": {
+          "type": "static_select",
+          "action_id": "filesearch_count",
+          "placeholder": "Select a count",
+          "options": [
+            {
+              "text": "1",
+              "value": "1"
+            },
+            {
+              "text": "2",
+              "value": "2"
+            },
+            {
+              "text": "4",
+              "value": "4"
+            },
+            {
+              "text": "8",
+              "value": "8"
+            }
+          ]
+        }
+      },
+      "28":{
+        "type": "text",
+        "text": "Page",
+        "block_id": "filesearch_page",
+        "accessory": {
+          "type": "static_select",
+          "action_id": "filesearch_page",
+          "placeholder": "Select a page",
+          "options": [
+            {
+              "text": "1",
+              "value": "1"
+            },
+            {
+              "text": "2",
+              "value": "2"
+            },
+            {
+              "text": "3",
+              "value": "4"
+            },
+            {
+              "text": "4",
+              "value": "4"
+            }
+          ]
+        }
+      },
+      "29":{
+        "type": "text",
+        "text": "From",
+        "block_id": "filesearch_tsfrom",
+        "accessory": {
+          "type": "datepicker",
+          "action_id": "filesearch_tsfrom",
+        }
+      },
+      "30":{
+        "type": "text",
+        "text": "To",
+        "block_id": "filesearch_tsto",
+        "accessory": {
+          "type": "datepicker",
+          "action_id": "filesearch_tsto",
+        }
+      },
     }
     
     

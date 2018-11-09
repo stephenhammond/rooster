@@ -8,9 +8,13 @@ const bodyParser = require('body-parser')
 const JSONParser = bodyParser.json();
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const fileUpload = require('express-fileupload');
+const cron = require('node-cron');
+ 
 
 app.use(express.static('public'))
 app.use(fileUpload());
+app.use(express.static('files'))
+app.set('view engine', 'pug')
 
 
 // var options = {
@@ -106,7 +110,13 @@ var messageMenuOptions = require('./messageMenuOptions.js')
 var databaseUtils = require('./databaseUtils.js')
 var listMethodsHandler = require('./listMethodsHandler.js')
 var filesUtils = require('./filesUtils.js')
+var base64Img = require('base64-img')
 
+//refresh tokens
+cron.schedule('0,24 * * * *', () => {
+  // refresh Rooster WTA
+  databaseUtils.refreshTokens("A628U0LN7")
+})
 
 
 app.get("/", (request, response) => {
@@ -117,50 +127,84 @@ app.get("/install", (request, response) => {
   response.sendFile(__dirname + '/views/add_to_slack.html')
 })
 
+app.get('/file_viewer', (request, response) => {
+  filesUtils.getFileFromID(request.query.id).then(function(fileData){
+    response.send(fileData.data).status(200)
+     // <img src="data:image/jpeg;base64,/9j/4RiDRXhpZgAATU0AKgA..." width="100" height="50" alt="base64 test">
+      //filesUtils.base64ToFile(fileData.data, fileData.mimetype)
+    // var image64 = fileData.data
+    // console.log("here's your data:")
+    // console.log(image64)
+    // // image64 = new Buffer(image64, 'base64')
+    // response.render('file_viewer', { title: 'RoosterBox', mimetype:"image/png", image: image64, fileName: fileData.name })
+    
+  })
+  
+})
+
 app.get("/files", (request, response) => {
-  response.sendFile(__dirname + '/views/files.html')
+  console.log(request.query.id)
+  if (request.query.id){
+    filesUtils.getFileFromID(request.query.id).then(function(fileData){
+      
+       var img = new Buffer(fileData.data, 'base64');
+
+       response.writeHead(200, {
+         'Content-Type': 'image/png',
+         'Content-Length': img.length
+       });
+       response.end(img); 
+      //response.send().status(200)
+     // <img src="data:image/jpeg;base64,/9j/4RiDRXhpZgAATU0AKgA..." width="100" height="50" alt="base64 test">
+      //filesUtils.base64ToFile(fileData.data, fileData.mimetype)
+    })
+    
+  }else{
+    response.sendFile(__dirname + '/views/files.html')
+  }
 })
 
 
 
 app.get('/auth/redirect', (req, res) =>{
-    console.log(req)
-	  var options = {
-  	  uri: process.env.SLACK_URL + '/api/oauth.access?code='+req.query.code+'&client_id='+process.env.CLIENT_ID+'&client_secret='+process.env.CLIENT_SECRET+'&redirect_uri='+process.env.REDIRECT_URI,
-		  method: 'GET'
-  	}
-  	request(options, (error, response, body) => {
-  		var jsonResponse = JSON.parse(body)
-  		console.log(jsonResponse)
-  		if (!jsonResponse.ok){
-  			console.log(jsonResponse)
-  			res.send("Error encountered: \n"+JSON.stringify(jsonResponse)).status(200).end()
-  		}else{
-  			console.log(jsonResponse)
-  			databaseUtils.saveInstallData(jsonResponse)
-  			res.send("Success!")
-  		}
-  	})
+  console.log(req)
+  var options = {
+    uri: process.env.SLACK_URL + '/api/oauth.access?code='+req.query.code+'&client_id='+process.env.CLIENT_ID+'&client_secret='+process.env.CLIENT_SECRET+'&redirect_uri='+process.env.REDIRECT_URI,
+    method: 'GET'
+  }
+  request(options, (error, response, body) => {
+    var jsonResponse = JSON.parse(body)
+    console.log(jsonResponse)
+    if (!jsonResponse.ok){
+      console.log(jsonResponse)
+      res.send("Error encountered: \n"+JSON.stringify(jsonResponse)).status(200).end()
+    }else{
+      console.log(jsonResponse)
+      databaseUtils.saveInstallData(jsonResponse)
+      res.send("Success!")
+    }
+  })
 })
 
 app.get('/auth/redirect/wta', (req, res) =>{
-    console.log(req)
-	  var options = {
-  	  uri: process.env.SLACK_URL + '/api/oauth.access?code='+req.query.code+'&client_id='+process.env.CLIENT_ID_WTA+'&client_secret='+process.env.CLIENT_SECRET_WTA+'&redirect_uri='+process.env.REDIRECT_URI_WTA,
-		  method: 'GET'
-  	}
-  	request(options, (error, response, body) => {
-  		var jsonResponse = JSON.parse(body)
-  		console.log(jsonResponse)
-  		if (!jsonResponse.ok){
-  			console.log(jsonResponse)
-  			res.send("Error encountered: \n"+JSON.stringify(jsonResponse)).status(200).end()
-  		}else{
-  			console.log(jsonResponse)
-  			databaseUtils.saveInstallData(jsonResponse)
-  			res.send("Success!")
-  		}
-  	})
+  console.log(req)
+  var options = {
+    uri: process.env.SLACK_URL + '/api/oauth.access?code='+req.query.code+'&client_id='+process.env.CLIENT_ID_WTA+'&client_secret='+process.env.CLIENT_SECRET_WTA+'&redirect_uri='+process.env.REDIRECT_URI_WTA,
+    method: 'GET'
+  }
+  request(options, (error, response, body) => {
+    var jsonResponse = JSON.parse(body)
+    console.log(jsonResponse)
+    if (!jsonResponse.ok){
+      console.log(jsonResponse)
+      res.send("Error encountered: \n"+JSON.stringify(jsonResponse)).status(200).end()
+    }else{
+      console.log(jsonResponse)
+      databaseUtils.saveInstallData(jsonResponse)
+      res.send("Success!")
+      //res.send(jsonResponse.logs)
+    }
+  })
 })
 
 
@@ -194,7 +238,7 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       }else{
         utils.sendMessageToSlackURL(responseURL, commandMessageHandler.usersAndConversationsButtons(reqBody.text), "")
       }
-    }else if (reqBody.command === "/block-kit" || reqBody.command === "/block-kit-wta"){
+    }else if (reqBody.command === "/rooster-block" || reqBody.command === "/block-kit-wta"){
       console.log(reqBody)
       console.log("DB COLLECTION!!")
       console.log(dbCollection)
@@ -227,6 +271,46 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       // send ephemeral menu to replace button message 
       utils.sendMessageToSlackURL(responseURL, menuToSend, responseOptions)
     
+    }else if (reqBody.command === "/searchfiles"){ // not used yet 
+      //WORK IN PROGRESSS
+      console.log(reqBody)
+      // filesUtils.getAllFilesForTeam(reqBody.team_id).then(function(files){
+      //   console.log("in /listfiles with all files")
+      var dbCollection = 'wta_installs'
+      // var externalID = req.body.externalID
+      // var externalURL = req.body.externalURL
+      // var fileID = req.body.fileID
+      // var preview = req.body.filePreview
+      // var title = req.body.fileTitle
+      var searchBlock =  { 
+        block_1: '26',
+        block_2: '27',
+        block_3: '28',
+        block_4: '29',
+        block_5: '30' 
+      }
+      utils.createBlockMessage(searchBlock).then(function(message){
+			  databaseUtils.getToken(reqBody.team_id, dbCollection).then(function(token){
+			    utils.sendMessageAsBot(token, message, reqBody.channel_id)
+		    })
+      })
+    
+    
+    }else if (reqBody.command === "/listfiles"){ // not used yet 
+      console.log(reqBody)
+      // filesUtils.getAllFilesForTeam(reqBody.team_id).then(function(files){
+      //   console.log("in /listfiles with all files")
+      
+      var dbCollection = 'wta_installs'
+    
+      databaseUtils.getToken(reqBody.team_id, dbCollection).then(function(token){
+        
+        utils.openDialog(token, reqBody.trigger_id, "filesList")
+      })
+      
+    
+      //utils.openDialog(token, reqBody.trigger_id, 5); // hardcoded to dialogOptions type 5 
+    
     }
   }
 	
@@ -255,6 +339,38 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     })
     
   }
+  else if(actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "block_kit_dialog"){
+    res.send('');
+    console.log("block kit action dialog")
+    var threadTS = ''
+    if (actionJSONPayload.message.thread_ts){
+      threadTS = actionJSONPayload.message.thread_ts
+    }
+    return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+      utils.openDialog(token, actionJSONPayload.trigger_id, "blocks", threadTS)
+    })
+    
+  }
+  else if(actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "random_block_kit"){
+    res.send('');
+    console.log("random block kit")
+    var threadTS = ''
+    if (actionJSONPayload.message.thread_ts){
+      threadTS = actionJSONPayload.message.thread_ts
+    }
+    utils.createBlockMessage(actionJSONPayload.submission, true).then(function(message){
+			databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+			  utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id, threadTS)
+		  })
+    //   var responseOptions = {}; 
+    //   responseOptions.response_type = "in_channel";
+    //   responseOptions.replace_original = "true";
+    //   console.log("HERE!!");
+    //   utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
+    })
+    
+    
+  }
   else if (actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "create_channel"){
     res.send('');
     return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
@@ -277,9 +393,13 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
   else if(actionJSONPayload.type == 'dialog_submission' && actionJSONPayload.callback_id == "blocks"){
     res.send('');
     console.log("create custom block message")
+    var threadTS = ''
+    if (actionJSONPayload.state){
+      threadTS = actionJSONPayload.state
+    }
     utils.createBlockMessage(actionJSONPayload.submission).then(function(message){
 			databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
-			  utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id)
+			  utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id, threadTS)
 		  })
     //   var responseOptions = {}; 
     //   responseOptions.response_type = "in_channel";
@@ -287,11 +407,48 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     //   console.log("HERE!!");
     //   utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, responseOptions);
     })
-  }else if (actionJSONPayload.type == 'block_actions'){
+  }
+  else if(actionJSONPayload.type == 'dialog_submission' && actionJSONPayload.callback_id == "filesListDialog"){
     res.send('');
+    console.log("Search dialog Files List submitted")
+    var submission = actionJSONPayload.submission
+    console.log(submission)
+    databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+      filesUtils.getFilesFromSlack(token, submission.channelIDSearch, submission.listCount, submission.listPage, submission.tsStart, submission.tsEnd).then(function(filesList){//, count, page, tsStart, tsEnd)
+        filesUtils.buildListMessage(filesList).then(function(filesMessage){
+          utils.sendMessageAsBot(token, filesMessage, actionJSONPayload.channel.id)
+        })
+      })
+    })
+  }
+  else if (actionJSONPayload.type == 'block_actions'){
+    console.log("in block_actions")
+    res.send('').end();
     var message = {}
+    var value = ''
+    var actionType = actionJSONPayload.actions[0].type
+    if (actionType == 'button' ){
+      value = actionJSONPayload.actions[0].value
+    }
+    else if (actionType == 'static_select' || actionType == 'overflow'){
+      value = actionJSONPayload.actions[0].selected_option.value
+    }
+    else if (actionType == 'datepicker'){
+      value = actionJSONPayload.actions[0].selected_date
+    }
+    else if (actionType == 'channels_select'){
+      value = actionJSONPayload.actions[0].selected_channel
+    }
+    else if (actionType == 'users_select'){
+      value = actionJSONPayload.actions[0].selected_user
+    }
+    else if (actionType == 'conversations_select'){
+      value = actionJSONPayload.actions[0].selected_conversation
+    }
+   
+    
     message.text = "Rooster's server received the following action request:"
-    message.attachments = [{"text": "value: " + actionJSONPayload.actions[0].value}]
+    message.attachments = [{"text": "you selected: " + value}]
     return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
 			utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id)
     })
@@ -431,7 +588,7 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
 
 app.post('/slack/events/', JSONParser, (req, res) =>{
 	var event = req.body.event
-  //console.log(event);
+  console.log(event);
 	if (req.body.challenge){
 		if (req.body.token === process.env.APP_VERIFICATION_TOKEN || req.body.token === process.env.APP_VERIFICATION_TOKEN_WTA){
 			res.send(req.body.challenge)
@@ -442,19 +599,45 @@ app.post('/slack/events/', JSONParser, (req, res) =>{
     
     var dbCollection = 'app_installs'
   
-    if (req.body.token ==  process.env.APP_VERIFICATION_TOKEN_WTA){
+    //if (req.body.token ==  process.env.APP_VERIFICATION_TOKEN_WTA){
       dbCollection = 'wta_installs'
-    }
+  //  }
     // rooster.glitch.me links to unfurl some cards because this was in high demand from my millions users 
 		res.status(200).end();
-    var randomCard = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"}
-    var unfurlMessage = {"text": "Let\'s shuffle the deck! <@"+event.user+">"}
-    databaseUtils.getToken(req.body.team_id, dbCollection).then(function(token){
-			utils.handleAppUnfurling(token, event.channel, event.message_ts, event.links, unfurlMessage);
-    })
-    databaseUtils.getBotToken(req.body.team_id).then(function(token){
-		  utils.sendMessageAsBot(token, randomCard, event.channel)
-    })
+    
+    
+    if (event.links[0].url.includes("file")){
+        console.log("file link!")
+        var fileID = event.links[0].url.split('=')[1]
+        console.log(fileID)
+      
+        var unfurlMessage = {
+          "blocks": [{
+              "type": "file",
+              "file_id": fileID,
+              "source": "remote",
+          }]
+        }
+    
+        
+        databaseUtils.getToken(req.body.team_id, dbCollection).then(function(token){
+          utils.handleFileUnfurling(token, event.channel, event.message_ts, event.links, unfurlMessage).then(function(body){
+            utils.sendMessageAsBot(token, {"text":body}, event.channel)
+          })
+          //utils.openDialogWithState(token, event.trigger_id, "file unfurl") // tested to confirm that it wouldn't work
+      })
+    }
+    
+    else{
+      var randomCard = {"text": "https://deckofcardsapi.com/static/img/" + utils.randomCardGenerator() + ".png"}
+      var unfurlMessage = {"text": "Let\'s shuffle the deck! <@"+event.user+">"}
+      databaseUtils.getToken(req.body.team_id, dbCollection).then(function(token){
+        utils.handleAppUnfurling(token, event.channel, event.message_ts, event.links, unfurlMessage).then()
+      })
+      databaseUtils.getBotToken(req.body.team_id).then(function(token){
+        utils.sendMessageAsBot(token, randomCard, event.channel)
+      })
+    }
 	}
 	else{
 		res.status(200).end();
@@ -485,22 +668,59 @@ app.post('/slack/options-load-point', urlencodedParser, (req, res) =>{
 
 })
 
-app.post('/upload', (req, res) =>{
+app.post('/upload-file', (req, res) =>{
   console.log(req.body.teamID)
   console.log(req.files.uploadFile.mimetype)
   console.log(req.files.uploadFile)
+  console.log(req.body.userID)
+  console.log(req.body.fileType)
+  
+  
   var dbCollection = 'wta_installs'
   databaseUtils.getToken(req.body.teamID, dbCollection).then(function(token){
-    filesUtils.addFileToSlack(req.files.uploadFile.name, req.files.uploadFile.name.mimetype, token).then(function(fileData){  
-      console.log('HERE:')
+    filesUtils.addFileToSlack(req.files.uploadFile.name, req.body.fileType, token, req.body.userID, req.body.isPreview).then(function(fileData){  
       console.log(fileData)
-      res.status(200)
-      filesUtils.saveNewFile(req.files.uploadFile, fileData)
+      res.status(200).send(fileData);
+      filesUtils.saveNewFile(req.files.uploadFile, fileData, req.body.teamID, fileData.external_id)
+      filesUtils.shareFileInSlack(token, req.body.channelID, fileData.id, req.body.userID)
     })
   })
   
   
 })
+
+app.post('/remove-file', (req, res) =>{
+  var dbCollection = 'wta_installs'
+  databaseUtils.getToken(req.body.teamID, dbCollection).then(function(token){
+    filesUtils.removeFileFromSlack(req.body.fileID, token).then(function(removeResponse){  
+      console.log("in /remove-file")
+      console.log(removeResponse)
+      res.status(200).send(removeResponse)
+      //filesUtils.removeFileFromDB(req.body.fileID)
+     
+    })
+  })
+})
+
+app.post('/update-file', (req, res) =>{
+  var dbCollection = 'wta_installs'
+  var externalID = req.body.externalID
+  var externalURL = req.body.externalURL
+  var fileID = req.body.fileID
+  var preview = req.body.filePreview
+  var title = req.body.fileTitle
+  databaseUtils.getToken(req.body.teamID, dbCollection).then(function(token){
+    filesUtils.updateFileInSlack(token, externalID, externalURL, fileID, preview, title).then(function(updateResponse){  
+      console.log("in /update-file")
+      console.log(updateResponse)
+      res.status(200).send(updateResponse)
+      //filesUtils.removeFileFromDB(req.body.fileID)
+     
+    })
+  })
+})
+
+
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Rooster server launched on port ${process.env.PORT}`)

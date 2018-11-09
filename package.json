@@ -14,7 +14,11 @@
     "assert": "^1.4.1",
     "mongodb": "^3.0.10",
     "greenlock": "^2.3.3",
-    "express-fileupload": "^0.4.0"
+    "express-fileupload": "^0.4.0",
+    "base64-img": "^1.0.4",
+    "pug": "^2.0.3",
+    "node-cron": "^2.0.0",
+    "ws": "^6.1.0"
   },
   "engines": {
     "node": "8.x"
