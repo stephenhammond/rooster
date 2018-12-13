@@ -25,25 +25,25 @@ var databaseUtils = {
 	},
 
 
-	getWebhookURL: function(requestData, responseOptions){
+	getWebhookURL: function(teamID){
 		return new Promise(
-	  		 function (resolve, reject) {
-				    mongodb.MongoClient.connect(uri, function(err, client) {
-		  			if(err) throw err
-		  			var db = client.db('bradslavin')
-		  			db.collection('app_installs').findOne({ team_id: requestData.team.id}, function(err, doc) {
-					    assert.equal(err, null)
-					    console.log("Found the following records")
-					    console.dir(doc.incoming_webhook.url)
-            			resolve(doc.incoming_webhook.url)
-            			reject(err)
-					})
-					client.close(function (err) {
-          			if(err) throw err
-       		})
-				})
-    		}
-    	)
+       function (resolve, reject) {
+          mongodb.MongoClient.connect(uri, function(err, client) {
+          if(err) throw err
+          var db = client.db('bradslavin')
+          db.collection('app_installs').findOne({ team_id: teamID}, function(err, doc) {
+            assert.equal(err, null)
+            console.log("Found the following records")
+            console.dir(doc.incoming_webhook.url)
+                resolve(doc.incoming_webhook.url)
+                reject(err)
+        })
+        client.close(function (err) {
+              if(err) throw err
+        })
+      })
+    }
+    )
 	},
 
 	getBotToken: function(teamID, responseOptions){

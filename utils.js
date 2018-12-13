@@ -15,9 +15,34 @@ var utils = {
     if (messageContent){// && messageContent.response_type){
 		  messageContent.response_type = responseOptions.response_type;
     }
-    messageContent.replace_original = responseOptions.replace_original;
+    messageContent.response_type = "ephemeral"
+    messageContent.replace_original = true;
+    
 		var postOptions = {
 			uri: responseURL,
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json',
+		  },
+			json: messageContent
+	  }
+	  request(postOptions, (err, response, body) => {
+	  		if(err) throw err
+        console.log(body)  
+        console.log(err)
+	  })
+		  
+	},
+  sendMessageToThreadUsingWebhook: function(webhookURL, threadTS, messageContent){
+    messageContent.thread_ts = threadTS
+    //messageContent.thread_ts = ""
+    messageContent.reply_broadcast = true
+    messageContent.icon_emoji = ":smile:"
+    messageContent.username = "Custom Username with emoji icon"
+    messageContent.channel = "#rooster-app"
+    //messageContent.icon_url = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2018-03-07/326533967701_69b9a39487ce763a1326_36.png"
+		var postOptions = {  
+			uri: webhookURL,
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json'
@@ -36,7 +61,7 @@ var utils = {
   sendMessageAsBot: function(token, messageBody, channelID, threadTS){
     var postData = messageBody;
     messageBody.channel = channelID;
-    //messageBody.as_user = false;
+    //messageBody.as_user = true;
     if (threadTS){
       postData.thread_ts = threadTS
     }
@@ -224,7 +249,7 @@ var utils = {
       }
       return results
     },
-   createBlockMessage: function(blockSelections, randomFlag){
+   createBlockMessage: function(blockSelections, randomFlag, topLevel){
      console.log("Create block message util")
      console.log(blockSelections)
      function getRandomArbitrary(min, max) {
@@ -278,17 +303,24 @@ var utils = {
             }
             
           }
+          if(topLevel){
+            var message = {
+              "blocks": blocksArray
+            }
           
-          var message = {
-           "text": "*Here's your Block Kit message:*",
-            "attachments":[
-              {
-                "blocks": blocksArray
-                
-            
-              }
-            ]
-          }     
+          }else{
+          
+            var message = {
+             "text": "*Here's your Block Kit message:*",
+              "attachments":[
+                {
+                  "blocks": blocksArray
+
+
+                }
+              ]
+            } 
+          }
           console.log("message")
           console.log(message)
           resolve(message)

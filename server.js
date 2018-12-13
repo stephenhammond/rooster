@@ -5,14 +5,14 @@ const https = require('https')
 const request = require('request')
 const fs = require('fs')
 const bodyParser = require('body-parser')
-const JSONParser = bodyParser.json();
+const JSONParser = bodyParser.json()
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
-const fileUpload = require('express-fileupload');
-const cron = require('node-cron');
+const fileUpload = require('express-fileupload')
+const cron = require('node-cron')
  
 
 app.use(express.static('public'))
-app.use(fileUpload());
+app.use(fileUpload())
 app.use(express.static('files'))
 app.set('view engine', 'pug')
 
@@ -233,8 +233,12 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       dbCollection = 'wta_installs'
     }
     if (reqBody.command === "/draw-a-card"){
+      //res.send(testMessage)
       if (reqBody.text === "help"){
         utils.sendMessageToSlackURL(responseURL, commandMessageHandler.help(), "")
+     // }if (reqBody.text === "test"){
+        //utils.sendMessageToSlackURL(responseURL, testMessage, "")
+      //  res.send(testMessage)
       }else{
         utils.sendMessageToSlackURL(responseURL, commandMessageHandler.usersAndConversationsButtons(reqBody.text), "")
       }
@@ -243,8 +247,23 @@ app.post('/slack/slash-commands/', urlencodedParser, (req, res) =>{
       console.log("DB COLLECTION!!")
       console.log(dbCollection)
       return databaseUtils.getToken(reqBody.team_id, dbCollection).then(function(token){
-				utils.openDialog(token, reqBody.trigger_id, "blocks")
+				utils.openDialog(token, reqBody.trigger_id, "blocks", reqBody.text)
 			})
+    }else if (reqBody.command === "/rooster-hook-thread"){
+      //res.send(200).end()
+      console.log(reqBody)
+      console.log("DB COLLECTION!!")
+      var webhookURL = "https://hooks.slack.com/services/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"
+      var message = commandMessageHandler.usersAndConversationsButtons("")
+      message.reply_broadcast = false
+      
+          // {
+          //   "text":"The time is: <!date^"+Math.round(Date.now()/1000)+"^{time}|current time>",
+          //   //"reply_broadcast": true
+          // }
+      //return databaseUtils.getWebhookURL(reqBody.team_id).then(function(webhookURL){
+        utils.sendMessageToThreadUsingWebhook(webhookURL, reqBody.text, message)
+      //})
     }
     else if (reqBody.command === "/dialog" || reqBody.command === "/dialogwta"){
       console.log(reqBody)
@@ -323,7 +342,63 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
   var callbackID = actionJSONPayload.callback_id
   console.log(actionJSONPayload)
   var dbCollection = 'app_installs'
-  
+  if (actionJSONPayload.callback_id == 'Callback_TOCHelp' ){
+    var newMessage = {
+      "text": "wave Hi there! Here are some methods to contact us:",
+      "attachments": [{
+        "fallback": "",
+        "color": "#42a5f5",
+        "pretext": "",
+        "author_name": "",
+        "title": "",
+        "text": "",
+        "fields": [{
+          "title": "",
+          "value": "Call the TOC: 1-123-456-7890",
+          "short": false
+        }, {
+          "title": "",
+          "value": "Support Slack channel: <slack://channel?team=T5FPG1QQ0&id=C2K2RJM6J|#toc>",
+          "short": false
+        }, {
+          "title": "",
+          "value": "Email support: email@example.com",
+          "short": false
+        }, {
+          "title": "",
+          "value": "TOCBot feedback: email@example.com",
+          "short": false
+        }],
+        "footer": "",
+        "actions": [],
+        "mrkdwn_in": ["text", "pretext", "fields"],
+        "callback_id": ""
+      }, {
+        "fallback": "",
+        "color": "#008000",
+        "pretext": "",
+        "author_name": "",
+        "title": "",
+        "text": "point_down",
+        "fields": [],
+        "footer": "",
+        "actions": [{
+          "name": "CONTINUE",
+          "text": "Main Menu",
+          "type": "button",
+          "value": "CONTINUE",
+          "url": "",
+          "options": []
+        }],
+        "mrkdwn_in": ["text", "pretext", "fields"],
+        "callback_id": "Callback_TOC"
+      }]
+    }
+    utils.sendMessageToSlackURL(actionJSONPayload.response_url, newMessage, "")
+  }
+  if (actionJSONPayload.callback_id == 'Callback_TOC' ){      
+    res.send("action received")
+  }
   if (actionJSONPayload.token == process.env.APP_VERIFICATION_TOKEN_WTA){
     dbCollection = 'wta_installs';
   }
@@ -394,10 +469,12 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     res.send('');
     console.log("create custom block message")
     var threadTS = ''
-    if (actionJSONPayload.state){
+    if (actionJSONPayload.state == "top"){
+      var topLevel = true
+    }else if(actionJSONPayload.state){
       threadTS = actionJSONPayload.state
     }
-    utils.createBlockMessage(actionJSONPayload.submission).then(function(message){
+    utils.createBlockMessage(actionJSONPayload.submission,"" ,topLevel).then(function(message){
 			databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
 			  utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id, threadTS)
 		  })
@@ -639,6 +716,9 @@ app.post('/slack/events/', JSONParser, (req, res) =>{
       })
     }
 	}
+  else if (event.type.includes("conversation")){
+    res.send(event)
+  }
 	else{
 		res.status(200).end();
 	}
