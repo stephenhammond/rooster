@@ -15,8 +15,8 @@ var utils = {
     if (messageContent){// && messageContent.response_type){
 		  messageContent.response_type = responseOptions.response_type;
     }
-    messageContent.response_type = "ephemeral"
-    messageContent.replace_original = true;
+    //messageContent.response_type = "ephemeral"
+    messageContent.replace_original = false;
     
 		var postOptions = {
 			uri: responseURL,
@@ -82,6 +82,78 @@ var utils = {
     })
 
 	},
+  createScheduledMessageAsBot: function(token, messageBody, channelID, threadTS, postAt){
+    return new Promise(
+      function (resolve, reject) {
+        messageBody.channel = channelID;
+        var postData = messageBody;
+        
+        postData.as_user = true;
+        if (threadTS){
+          postData.thread_ts = threadTS
+        }
+        postData.post_at = postAt;
+       
+       console.log("********** POST DATA **********")
+       console.log(postData)
+        
+        var postOptions = {
+          uri: process.env.SLACK_URL + "/api/chat.scheduleMessage",
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          json: postData
+        };
+        
+        // silly for loop for testing rate limiting
+        //for (var i = 0; i < 100; i++){
+          request(postOptions, (err, response, body) => {
+            if(err) throw err
+            console.log(body)
+            resolve(body.scheduled_message_id)
+          })
+       // }
+        
+        
+      })
+
+	},
+  deleteScheduledMessage: function(token, scheduledMessageID, channelID){
+    return new Promise(
+      function (resolve, reject) {
+        var postData = {};
+        postData.channel = channelID;
+        postData.scheduled_message_id = scheduledMessageID;
+        //postData.scheduled_message_id = "QGNMN1XN2";
+        //messageBody.as_user = true;
+        // if (threadTS){
+        //   postData.thread_ts = threadTS
+        // }
+        // postData.post_at = postAt;
+
+        var postOptions = {
+          uri: process.env.SLACK_URL + "/api/chat.deleteScheduledMessage",
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          json: postData
+        };
+
+        request(postOptions, (err, response, body) => {
+          if(err) throw err
+          console.log(body)
+          resolve(body)
+        })
+        
+        
+      })
+
+	},
+  
   
   // function to generate a random two character string that represents a playing card
   // special thanks to https://deckofcardsapi.com/ for making this possible 
@@ -122,6 +194,7 @@ var utils = {
         }
         var unfurls = {}
         unfurls[links[0].url] = messageContent
+        unfurls[links[0].url].hide_color = true
         data["unfurls"] = JSON.stringify(unfurls)
         request.post(
           process.env.SLACK_URL + "/api/chat.unfurl",
@@ -142,12 +215,12 @@ var utils = {
       })
 	},
   
-  openDialog: function(token, triggerID, dialogSelection, dialogState){
+  openDialog: function(token, triggerID, dialogSelection, dialogState, channelID){
 		console.log("open dialog!!");
 		var data = {
       token: token, //process.env.ACCESS_TOKEN,
 		  trigger_id: triggerID,
-		  dialog: JSON.stringify(dialogOptions.dialogSelector(dialogSelection, dialogState))
+		  dialog: JSON.stringify(dialogOptions.dialogSelector(dialogSelection, dialogState, channelID))
 		}
 
 		request.post(
@@ -156,13 +229,13 @@ var utils = {
         form: data
       },
       function (error, response, body) {
-          if (!error && response.statusCode == 200) {
-            console.log("Success!")
-            console.log(body)
-          } else {
-            console.log("Fail")
-            console.log(error) 
-          }
+        if (!error && response.statusCode == 200) {
+          console.log("Success!")
+          console.log(body)
+        } else {
+          console.log("Fail")
+          console.log(error) 
+        }
       }
    )
   },
@@ -257,16 +330,16 @@ var utils = {
      }
      if (randomFlag){
         blockSelections = {
-          block_1: getRandomArbitrary(1,25),
-          block_2: getRandomArbitrary(1,25),
-          block_3: getRandomArbitrary(1,25),
-          block_4: getRandomArbitrary(1,25),
-          block_5: getRandomArbitrary(1,25),
-          block_6: getRandomArbitrary(1,25),
-          block_7: getRandomArbitrary(1,25),
-          block_8: getRandomArbitrary(1,25),
-          block_9: getRandomArbitrary(1,25),
-          block_10: getRandomArbitrary(1,25)
+          block_1: 2, //getRandomArbitrary(1,25),
+          block_2: 10, //getRandomArbitrary(1,25),
+          block_3: 13, //getRandomArbitrary(1,25),
+          block_4: 5, //getRandomArbitrary(1,25),
+          block_5: 3, //getRandomArbitrary(1,25),
+          block_6: 25,//getRandomArbitrary(1,25),
+          block_7: 14,// getRandomArbitrary(1,25),
+          block_8: 12,// getRandomArbitrary(1,25),
+          block_9: 16,// getRandomArbitrary(1,25),
+          block_10: 19//getRandomArbitrary(1,25)
         }
 //          blockSelections ={ block_1: 22,
 
@@ -311,14 +384,15 @@ var utils = {
           }else{
           
             var message = {
-             "text": "*Here's your Block Kit message:*",
-              "attachments":[
-                {
-                  "blocks": blocksArray
+              //"text": "*Here's your Block Kit message:*",
+              "blocks": blocksArray
+//               "attachments":[
+//                 {
+//                   "blocks": blocksArray
 
 
-                }
-              ]
+//                 }
+//               ]
             } 
           }
           console.log("message")

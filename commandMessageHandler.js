@@ -12,7 +12,8 @@ var commmandMessageHandler = {
 	},
 	usersAndConversationsButtons: function(callbackOption){
 		var message = {
-      "text": "Choose where to send a random card",
+      "text": "Choose where to send a random card https://stevetest1.slack.com/files/U14M0KP89/F94TUUB6E/house_colour_2.jpg",
+      "unfurl_links": true,
       "pretext":"this is a lot of pretext this is a lot of pretext this is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretextthis is a lot of pretext this is a lot of pretext",
       "attachments": [
         {

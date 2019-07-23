@@ -3,7 +3,7 @@ var blockOptionsListForDialog = require('./blockOptions.js').optionsMasterList()
 
 var dialogOptions = {
 
-	dialogSelector: function(input, stateInput){		
+	dialogSelector: function(input, stateInput, channelID){		
 		var options = {
 			"1": {
 			   
@@ -37,7 +37,7 @@ var dialogOptions = {
             //"value": "Does this wrap? Does this wrap? Does this wrap? Does this wrap? Does this wrap? Does this wrap? Does this wrap?"
 						"hint":"Channel names can only contain lowercase letters, numbers, hyphens, and underscores, and must be 21 characters or less."
 					}],
-			   "title":"A really nice app",
+			   "title":":tada: A really nice app",
 				 "submit_label":"Create",
          "notify_on_cancel": true,
          "state": ""
@@ -215,7 +215,8 @@ var dialogOptions = {
 					},
 					{
 					    	"type": "select", //required
-					   	  "label": "Fourth Field", // required
+					   	  //"label": "Fourth Field", // required
+                "label": "WWWWWWWWW WWWWWWWWWWW WWWWWWWWW WWWWWWWWWWWWWWWW",
 					    	"name": "fourth_field", // required
 				    		"hint": "hint hint",
 				    		"max_length": 4, // default 500
@@ -350,7 +351,7 @@ var dialogOptions = {
 								"label": "External Time",
 								"type": "select",
 								"data_source": "external",
-								"min_query_length": 1, // TEST THIS!
+								"min_query_length": 0, // TEST THIS!
                 "selected_options":[
                   {
                     "value": "what",
@@ -365,10 +366,12 @@ var dialogOptions = {
 			   
 			    "callback_id": "simple-dialog-example",
 				  "title": "Rooster Dialog Greatness",
+          "state": "this_is_the_state",
 				  "elements": [
 				 	{
 					    	"type": "text", //required
-					   	  "label": "First Name", //required
+					   	  //"label": "This label is 48 characters long... now it is!!!", //required
+                "label": "WWWWWWWWW WWWWWWWWWWW WWWWWWWWW WWWWWWWWWWWWWWWW",
 					    	"name": "first_name", //required
 				    		"hint": "hint hint",
 				    		"max_length": 4, // default 500
@@ -392,7 +395,7 @@ var dialogOptions = {
 					},
 					{
 					    	"type": "text", //required
-					   	  "label": "third field", // required
+					   	  "label": "This label is 48 characters long... now it is!!!", // required
 					    	"name": "third_field", // required
 				    		"hint": "hint hint",
 				    		"max_length": 4, // default 500
@@ -449,7 +452,8 @@ var dialogOptions = {
 					{
 					    	"type": "select", //required
                 "data_source": "conversations",
-					    	"label": "Conversations", // required
+					    	//"label": "Conversations", // required
+                "label": "WWWWWWWWW WWWWWWWWWWW WWWWWWWWW WWWWWWWWWWWWWWWW",
 					    	"name": "conversations",
                 "value": "C3H4FF94K",
 					},
@@ -458,8 +462,22 @@ var dialogOptions = {
                 "data_source": "channels",
 					    	"label": "Channels", // required
 					    	"name": "Channels",
-                "value": "C3H4FF94K",
-					}
+                "value": "CAY30F2KA",
+					},
+          {
+					    	"type": "select", //required
+                "data_source": "channels",
+					    	"label": "This label is 48 characters long... now it is!!!", // required
+					    	"name": "Channels2",
+                "value": "CAY30F2KA"
+					},
+					 // {
+					 //    	"type": "select", //required
+					 //      "data_source": "channels",
+					 //     	"label": "Channels 3", // required
+					 //     	"name": "Channels3",
+					 //      "value": "CAY30F2KA"
+					 // }
 				]
 			},
       "state": {
@@ -661,9 +679,65 @@ var dialogOptions = {
 				    		"value": ""
 					}
         ]
+      },
+      "scheduled": {
+        "callback_id": "scheduled_message",
+        "title": "Schedule a message",
+        "notify_on_cancel": true,
+        "state": stateInput,
+        "elements": [
+          {
+            "type": "select",
+            "name": "timeOffset",
+            "label": "Send message in ...",
+            "options": [
+              {
+                "value": "60",
+                "label": "1 minute"
+              },
+              {
+                "value": "300",
+                "label": "5 minutes"
+              },
+              {
+                "value": "1800",
+                "label": "30 minutes"
+              },
+              {
+                "value": "9000",
+                "label": "2.5 hours"
+              },
+              {
+                "value": "10540000",
+                "label": "122 days"
+              },
+              {
+                "value": "5",
+                "label": "5 seconds"
+              },
+              {
+                "value": "-60",
+                "label": "-1 minute"
+              },
+               {
+                "value": "10280000",
+                "label": "119 days"
+              },
+              
+              
+            ]
+          },
+          {
+            "type": "select", //required
+            "data_source": "conversations",
+            "label": "Choose where to send the message", // required
+            "name": "conversationScheduled",
+            "value": channelID
+          },
+        ]
       }
 		}
-    console.log(blockOptionsListForDialog)
+    //console.log(blockOptionsListForDialog)
 		return options[input]
 
 	} 

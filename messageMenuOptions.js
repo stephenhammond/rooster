@@ -671,6 +671,18 @@ var messageMenuOptions = {
 										"text": "stars.list (no WTA support)",
 										"value": 5
 									},
+                  {
+										"text": "files.list",
+										"value": 6
+									},
+                  {
+										"text": "chat.scheduledMessages.list",
+										"value": 7
+									},
+                  {
+										"text": "files.remote.list",
+										"value": 8
+									},
                   
 								]
 							}

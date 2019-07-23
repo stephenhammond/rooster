@@ -9,6 +9,7 @@ const JSONParser = bodyParser.json()
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const fileUpload = require('express-fileupload')
 const cron = require('node-cron')
+const moment = require('moment')
  
 
 app.use(express.static('public'))
@@ -16,92 +17,6 @@ app.use(fileUpload())
 app.use(express.static('files'))
 app.set('view engine', 'pug')
 
-
-// var options = {
-//     host: 'platform-tls-client.slack.com',
-//     port: 443,
-//     method: 'GET'
-// };
-
-// var req = https.request(options, function(res) {
-//     console.log(res.connection.getPeerCertificate());
-// });
-
-// req.end();
-
-// const server = https.createServer({
-//   cert: fs.readFileSync('./cert.crt'),
-//   key: fs.readFileSync('./private.key'),
-//   ca: fs.readFileSync('./chain.pem'),
-//   requestCert: true,
-//   rejectUnauthorized: true,
-// }, app)
-
-
-// app.on('tlsClientError', (err, socket) => {
-//   console.log(`req at ${new Date().toString()}:`)
-//   console.log(`\ttlsClientError: ${err}`)
-// })
-
-// app.on('response', function (res) {
-//   console.log("here")
-//   console.log('peerCertificate:',res.socket.getPeerCertificate());
-//   console.log('authorized:',res.socket.authorized);
-//   console.log('authorizationError:',res.socket.authorizationError);
-// });
-
-
-// app.all('/*', (req, res) => {
-//   const cert = req.socket.getPeerCertificate()
-//   //if (cert && cert.subject) {
-//     console.log(`\tpeer cert CN: ${cert.subject.CN}`)
-//   //}
-//   res.end("ok")
-// })
-
-// const socket = require('tls').connect(443, "platform-tls-client.slack.com", () => {
-//   console.log('client connected',
-//     socket.authorized ? 'authorized' : 'unauthorized');
-//   process.stdin.pipe(socket);
-//   process.stdin.resume();
-// });
-
-
-// var opts = {
-//   domains: [ 'rooster.glitch.me']
-// , email: 'shammond@slack-corp.com'
-// , agreeTos: true                  // Accept Let's Encrypt v2 Agreement
-// , communityMember: false           // Help make Greenlock better by submitting
-//                                   // stats and getting updates
-// };
-
-
-// // ////////////////////
-// // // INIT GREENLOCK //
-// // ////////////////////
-
-// var greenlock = require('greenlock').create({
-//   version: 'draft-11'
-// , server: 'https://acme-v02.api.letsencrypt.org/directory'
-// , configDir: '/tmp/acme/etc'
-// });
-// app.use('/', greenlock.middleware());
-
-// ///////////////////
-// // GET TLS CERTS //
-// ///////////////////
-
-// greenlock.register(opts).then(function (certs) {
-//   console.log("CERTS!");
-//   console.log(certs);
-//   // privkey, cert, chain, expiresAt, issuedAt, subject, altnames
-// }, function (err) {
-//   console.error(err);
-// });
-
-// greenlock.check({ domains: [ 'rooster.glitch.me' ] }).then(function (results) {
-//   console.log(results)
-// });
 
 // files that make app do things
 var utils = require('./utils.js')
@@ -125,6 +40,11 @@ app.get("/", (request, response) => {
 
 app.get("/install", (request, response) => {
   response.sendFile(__dirname + '/views/add_to_slack.html')
+})
+
+app.post("/webhooks", urlencodedParser, (req, res) => {
+  console.log("------------- OUTGOING WEBHOOK REQUEST -------------")
+  console.log(req.body);//urlencodedParser, 
 })
 
 app.get('/file_viewer', (request, response) => {
@@ -340,6 +260,9 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
   console.log("action received")
 	var actionJSONPayload = JSON.parse(req.body.payload) // parse URL encoded payload JSON string
   var callbackID = actionJSONPayload.callback_id
+  // if (actionJSONPayload.team == "T14KDQWKV"){
+  //   res.send(actionJSONPayload)
+  // }
   console.log(actionJSONPayload)
   var dbCollection = 'app_installs'
   if (actionJSONPayload.callback_id == 'Callback_TOCHelp' ){
@@ -433,9 +356,11 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     if (actionJSONPayload.message.thread_ts){
       threadTS = actionJSONPayload.message.thread_ts
     }
+    
     utils.createBlockMessage(actionJSONPayload.submission, true).then(function(message){
 			databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
 			  utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id, threadTS)
+        //utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, "")
 		  })
     //   var responseOptions = {}; 
     //   responseOptions.response_type = "in_channel";
@@ -450,6 +375,16 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     res.send('');
     return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
 			utils.openDialog(token, actionJSONPayload.trigger_id, 1)
+    })
+  }
+  else if (actionJSONPayload.type == 'message_action' && actionJSONPayload.callback_id == "scheduled_message"){
+    res.send('');
+    var threadTS = ''
+    if (actionJSONPayload.message.thread_ts){
+      threadTS = actionJSONPayload.message.thread_ts
+    }
+    return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+			utils.openDialog(token, actionJSONPayload.trigger_id, "scheduled", threadTS, actionJSONPayload.channel.id)
     })
   }
   else if (actionJSONPayload.type == 'message_action'){
@@ -498,7 +433,74 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
       })
     })
   }
-  else if (actionJSONPayload.type == 'block_actions'){
+  else if(actionJSONPayload.type == 'dialog_submission' && actionJSONPayload.callback_id == "scheduled_message"){
+    res.send('');
+    console.log("Scheduling message")
+    var threadTS= ""
+    var submission = actionJSONPayload.submission
+    var scheduledTimeInSeconds = moment().add(submission.timeOffset, 'seconds')
+
+    var message = {}
+    message.text = "Message scheduled successfully"
+//     message.attachments = [
+//       {"text": "sending message at: " + scheduledTimeInSeconds.zone("-08:00").format('LT'),
+//       },
+      
+//     ]
+    
+    if(actionJSONPayload.state){
+      threadTS = actionJSONPayload.state
+    }
+    
+    message.blocks = [
+      {
+        "type": "section",
+        "block_id": "delayed_scheduled_response",
+        "text": {
+          "type": "mrkdwn",
+          "text": "You have scheduled a message to be sent at: " + scheduledTimeInSeconds.zone("-07:00").format('LT')
+        },
+        "accessory": {
+          "type": "button",
+          //"action_id": "1234",
+          "text": {
+            "type": "plain_text",
+            "text": "Cancel message",
+            "emoji": true
+          },
+          "value": "delete_scheduled_message"
+        }
+      }
+    ]
+    message.reply_broadcast = true
+    
+    //message.as_user = true
+    
+    //var scheduledMessage = commandMessageHandler.usersAndConversationsButtons("")
+    //scheduledMessage.as_user = true
+    
+    // var scheduledMessage = {}
+    // scheduledMessage.text = "This message was scheduled in the past"
+    // scheduledMessage.attachments = [{"text": "message was scheduled at: " + moment().zone("-08:00").format('LT')}]
+    
+    utils.createBlockMessage(actionJSONPayload.submission, true).then(function(scheduledMessage){
+      //scheduledMessage.attachments = [{"text": "message was scheduled at: " + moment().zone("-08:00").format('LT')}]
+      databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+        // var scheduledMessage = {}
+        // scheduledMessage.text = "This message was scheduled in the past"
+        // scheduledMessage.attachments = [{"text": "message was scheduled at: " + moment().zone("-08:00").format('LT')}]
+        //var scheduledMessage = commandMessageHandler.usersAndConversationsButtons("")
+        //scheduledMessage.as_user = true
+        scheduledMessage.reply_broadcast = true
+        utils.createScheduledMessageAsBot(token, scheduledMessage, submission.conversationScheduled, threadTS, scheduledTimeInSeconds.format('X')).then(function(scheduledMessageID){
+          message.blocks[0].accessory.action_id = scheduledMessageID
+          utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id, threadTS)
+          //utils.sendMessageAsBot(token, scheduledMessage, actionJSONPayload.channel.id, threadTS)
+        })
+      })
+    })
+  }
+  else if (actionJSONPayload.type == 'block_actions' && actionJSONPayload.actions[0].block_id != 'delayed_scheduled_response'){
     console.log("in block_actions")
     res.send('').end();
     var message = {}
@@ -528,9 +530,27 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
     message.attachments = [{"text": "you selected: " + value}]
     return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
 			utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id)
+      //utils.sendMessageToSlackURL(actionJSONPayload.response_url, message, "")
     })
   }
+  
+  // SCHEDULED MESSAGES DELETION FROM BUTTON
+  else if (actionJSONPayload.type == 'block_actions' && actionJSONPayload.actions[0].block_id == 'delayed_scheduled_response'){
+    res.send('').end();
+    var message = {}
+    var scheduledMessageID = actionJSONPayload.actions[0].action_id
+    message.text = "You have deleted scheduled message id: " + scheduledMessageID
+    //message.attachments = [{"text": "you selected: " + value}]
+    return databaseUtils.getToken(actionJSONPayload.team.id, dbCollection).then(function(token){
+      utils.deleteScheduledMessage(token, scheduledMessageID, actionJSONPayload.channel.id).then(function(body){
+        if (!body.ok){
+          message.text = "Error deleting message id: " + scheduledMessageID + "\nResponse: " + body.error
+        }
+			  utils.sendMessageAsBot(token, message, actionJSONPayload.channel.id)
+      })
+    })
     
+  }
     
   //   var message = {
   //       "text": "Open your new channel",
@@ -636,6 +656,15 @@ app.post('/slack/actions', urlencodedParser, (req, res) =>{
           case '5':
             method = 'stars.list'
             break;
+          case '6':
+            method = 'files.list'
+            break;
+          case '7':
+            method = 'chat.scheduledMessages.list'
+            break;
+          case '8':
+            method = 'files.remote.list'
+            break;
           default:
           console.log("shoot")
           res.status(200).end() 
@@ -677,13 +706,13 @@ app.post('/slack/events/', JSONParser, (req, res) =>{
     var dbCollection = 'app_installs'
   
     //if (req.body.token ==  process.env.APP_VERIFICATION_TOKEN_WTA){
-      dbCollection = 'wta_installs'
+      //dbCollection = 'wta_installs'
   //  }
     // rooster.glitch.me links to unfurl some cards because this was in high demand from my millions users 
 		res.status(200).end();
     
     
-    if (event.links[0].url.includes("file")){
+    if (event.links[0].url.includes("file_viewer")){
         console.log("file link!")
         var fileID = event.links[0].url.split('=')[1]
         console.log(fileID)
@@ -691,15 +720,15 @@ app.post('/slack/events/', JSONParser, (req, res) =>{
         var unfurlMessage = {
           "blocks": [{
               "type": "file",
-              "file_id": fileID,
+              "external_id": fileID,
               "source": "remote",
           }]
         }
     
         
-        databaseUtils.getToken(req.body.team_id, dbCollection).then(function(token){
+        databaseUtils.getUserToken(req.body.team_id, dbCollection, event.user).then(function(token){
           utils.handleFileUnfurling(token, event.channel, event.message_ts, event.links, unfurlMessage).then(function(body){
-            utils.sendMessageAsBot(token, {"text":body}, event.channel)
+            //utils.sendMessageAsBot(token, {"text":body}, event.channel)
           })
           //utils.openDialogWithState(token, event.trigger_id, "file unfurl") // tested to confirm that it wouldn't work
       })
@@ -754,15 +783,32 @@ app.post('/upload-file', (req, res) =>{
   console.log(req.files.uploadFile)
   console.log(req.body.userID)
   console.log(req.body.fileType)
+  var dbCollection = 'app_installs'
   
-  
-  var dbCollection = 'wta_installs'
-  databaseUtils.getToken(req.body.teamID, dbCollection).then(function(token){
-    filesUtils.addFileToSlack(req.files.uploadFile.name, req.body.fileType, token, req.body.userID, req.body.isPreview).then(function(fileData){  
-      console.log(fileData)
-      res.status(200).send(fileData);
-      filesUtils.saveNewFile(req.files.uploadFile, fileData, req.body.teamID, fileData.external_id)
-      filesUtils.shareFileInSlack(token, req.body.channelID, fileData.id, req.body.userID)
+  var isPreview = req.body.isPreview
+  //isPreview = false // using to test share then update to add thumbnails 
+  //var dbCollection = 'app_installs'
+  databaseUtils.getBotToken(req.body.teamID, dbCollection).then(function(token){
+    databaseUtils.getUserToken(req.body.teamID, dbCollection,req.body.userID).then(function(userToken){
+      filesUtils.addFileToSlack(req.files.uploadFile.name, req.body.fileType, token, req.body.userID, isPreview).then(function(fileData){  
+        console.log("FILE DATA:")
+        console.log(fileData)
+        res.status(200).send(fileData);
+        filesUtils.saveNewFile(req.files.uploadFile, fileData, req.body.teamID, fileData.external_id)
+        if (req.body.shareAsUser == "yes"){
+          var sharingToken = userToken        
+        }
+        else {
+        sharingToken = token
+        }
+        filesUtils.shareFileInSlack(sharingToken, req.body.channelID, fileData.id, req.body.userID).then(function(updateResponse){
+          console.log('HERE!!')
+          //filesUtils.updateFileInSlack(token, fileData.external_id, fileData.external_url, fileData.id, "yes", "")
+          
+    
+          
+        })
+      })
     })
   })
   
@@ -770,8 +816,8 @@ app.post('/upload-file', (req, res) =>{
 })
 
 app.post('/remove-file', (req, res) =>{
-  var dbCollection = 'wta_installs'
-  databaseUtils.getToken(req.body.teamID, dbCollection).then(function(token){
+  //var dbCollection = 'app_installs'
+  databaseUtils.getBotToken(req.body.teamID).then(function(token){
     filesUtils.removeFileFromSlack(req.body.fileID, token).then(function(removeResponse){  
       console.log("in /remove-file")
       console.log(removeResponse)
@@ -783,17 +829,36 @@ app.post('/remove-file', (req, res) =>{
 })
 
 app.post('/update-file', (req, res) =>{
-  var dbCollection = 'wta_installs'
-  var externalID = req.body.externalID
-  var externalURL = req.body.externalURL
+ // var dbCollection = 'apps_installs'
+  var externalID = req.body.fileExternalID
+  var externalURL = req.body.fileExternalURL
   var fileID = req.body.fileID
-  var preview = req.body.filePreview
+  var preview = req.body.updatePreview
   var title = req.body.fileTitle
-  databaseUtils.getToken(req.body.teamID, dbCollection).then(function(token){
+  var dbCollection = 'app_installs'
+  console.log(req.body)
+  databaseUtils.getBotToken(req.body.teamID, dbCollection).then(function(token){
     filesUtils.updateFileInSlack(token, externalID, externalURL, fileID, preview, title).then(function(updateResponse){  
       console.log("in /update-file")
       console.log(updateResponse)
       res.status(200).send(updateResponse)
+      //filesUtils.removeFileFromDB(req.body.fileID)
+     
+    })
+  })
+})
+
+app.post('/info-file', (req, res) =>{
+ // var dbCollection = 'apps_installs'
+  var externalID = req.body.fileExternalID
+  var fileID = req.body.fileID
+  var dbCollection = 'app_installs'
+  //console.log(req.body)
+  databaseUtils.getBotToken(req.body.teamID, dbCollection).then(function(token){
+    filesUtils.getFileInfoFromSlack(token, fileID, externalID).then(function(infoResponse){  
+      console.log("in /info-file")
+      console.log(infoResponse)
+      res.status(200).send(infoResponse)
       //filesUtils.removeFileFromDB(req.body.fileID)
      
     })

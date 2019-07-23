@@ -1,3 +1,4 @@
+
 var blockOptions = {
   
   optionsMasterList: function(){
@@ -134,8 +135,8 @@ var blockOptions = {
       "1a": {
         "type": "section",
         "text": {
-          "type": "plaintext",
-          "text": "Plaintext: *bold* _italic_ ~strikethrough~ `code`"
+          "type": "plain_text",
+          "text": "Plain text: *bold* _italic_ ~strikethrough~ `code`"
         }
       },
        "1b": {
@@ -143,23 +144,23 @@ var blockOptions = {
         "block_id": "section789",
         "fields": [
           {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "*this is plaintext text*"
           },
           {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "*this is plaintext text*"
           },
           {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "*this is plaintext text*"
           },
           {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "*this is plaintext text*"
           },
           {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "*this is plaintext text*"
           }
         ]
@@ -167,7 +168,7 @@ var blockOptions = {
       "2": {
        	"type": "image",
         "title": {
-          "type": "plaintext",
+          "type": "plain_text",
           "text": "Catch That Baby"
         },
         "block_id": "image123",
@@ -191,12 +192,12 @@ var blockOptions = {
       },
       "4":	{
         "type": "actions",
-        "block_id": "actionblock123",
+        "block_id": "actionblock12asdasd3",
         "elements": [
           {
             "type": "button",
             "text": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "red"
             },
             "value": "red",
@@ -205,7 +206,7 @@ var blockOptions = {
           {
             "type": "button",
             "text": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "blue"
             },
             "value": "blue",
@@ -214,7 +215,7 @@ var blockOptions = {
           {
             "type": "button",
             "text": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "green"
             },
             "value": "green",
@@ -248,7 +249,7 @@ var blockOptions = {
         "accessory": {
           "type": "button",
           "text": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Click Me"
           },
           "value": "click_me_123",
@@ -266,27 +267,27 @@ var blockOptions = {
           "action_id": "text1234",
           "type": "static_select",
           "placeholder": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Select an item"
           },
           "options": [
             {
               "text": {
-                "type": "plaintext",
+                "type": "plain_text",
                 "text": "0 - *this is plaintext text*"
               },
               "value": "value-0"
             },
             {
               "text": {
-                "type": "plaintext",
+                "type": "plain_text",
                 "text": "1 - *this is plaintext text*"
               },
               "value": "value-1"
             },
             {
               "text": {
-                "type": "plaintext",
+                "type": "plain_text",
                 "text": "2 - *this is plaintext text*"
               },
               "value": "value-2"
@@ -306,35 +307,35 @@ var blockOptions = {
           "options": [
             {
               "text": {
-                "type": "plaintext",
+                "type": "plain_text",
                 "text": "*this is plaintext text*"
               },
               "value": "value-0"
             },
             {
               "text": {
-                "type": "plaintext",
+                "type": "plain_text",
                 "text": "*this is plaintext text*"
               },
               "value": "value-1"
             },
             {
               "text": {
-                "type": "plaintext",
+                "type": "plain_text",
                 "text": "*this is plaintext text*"
               },
               "value": "value-2"
             },
             {
               "text": {
-                "type": "plaintext",
+                "type": "plain_text",
                 "text": "*this is plaintext text*"
               },
               "value": "value-3"
             },
             {
               "text": {
-                "type": "plaintext",
+                "type": "plain_text",
                 "text": "*this is plaintext text*"
               },
               "value": "value-4"
@@ -355,7 +356,7 @@ var blockOptions = {
           "action_id": "datepicker123asdfasdfasdcghj",
           "initial_date": "1990-04-28",
           "placeholder": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Select a date"
           }
         }
@@ -416,7 +417,7 @@ var blockOptions = {
             "action_id": "datepicker123asdfasdfasdfh",
             //"initial_date": "1990-04-28",
             "placeholder": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Select a date"
             }
           },
@@ -425,35 +426,35 @@ var blockOptions = {
             "options": [
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "*this is plaintext text*"
                 },
                 "value": "value-0"
               },
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "*this is plaintext text*"
                 },
                 "value": "value-1"
               },
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "*this is plaintext text*"
                 },
                 "value": "value-2"
               },
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "*this is plaintext text*"
                 },
                 "value": "value-3"
               },
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "*this is plaintext text*"
                 },
                 "value": "value-4"
@@ -464,7 +465,7 @@ var blockOptions = {
           {
             "type": "button",
             "text": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Click Me"
             },
             "value": "click_me_123",
@@ -479,35 +480,35 @@ var blockOptions = {
           {
             "type": "static_select",
             "placeholder":{
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Which witch is the witchiest witch?"
             },
             "action_id": "select_2asdfasdf",
             "options": [
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "Matilda"
                 },
                 "value": "matilda"
               },
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "Glinda"
                 },
                 "value": "glinda"
               },
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "Granny Weatherwax"
                 },
                 "value": "grannyWeatherwax"
               },
               {
                 "text": {
-                  "type": "plaintext",
+                  "type": "plain_text",
                   "text": "Hermione"
                 },
                 "value": "hermione"
@@ -517,7 +518,7 @@ var blockOptions = {
           {
             "type": "button",
             "text": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Cancel"
             },
             "value": "cancel",
@@ -536,7 +537,7 @@ var blockOptions = {
           "action_id": "textadfhfghj",
           "type": "users_select",
           "placeholder": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Select a user"
           }
         }
@@ -552,7 +553,7 @@ var blockOptions = {
           "action_id": "text1adfgadfg",
           "type": "channels_select",
           "placeholder": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Select a channel"
           }
         }
@@ -568,7 +569,7 @@ var blockOptions = {
           "action_id": "text2345ghksdf",
           "type": "conversations_selectfghjfghj",
           "placeholder": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Select a conversation"
           }
         }
@@ -581,7 +582,7 @@ var blockOptions = {
             "type": "users_select",
             "action_id": "users_selectfghjubas",
             "placeholder": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Select a user"
             }
           }
@@ -595,7 +596,7 @@ var blockOptions = {
             "type": "channels_select",
             "action_id": "channels_selectfghjertxvhj",
             "placeholder": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Select a channel"
             }
           }
@@ -609,7 +610,7 @@ var blockOptions = {
             "type": "conversations_select",
             "action_id": "conversations_selectfghjffasdar",
             "placeholder": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Select a conversation"
             }
           }
@@ -627,7 +628,7 @@ var blockOptions = {
           "type": "users_select",
           "initial_user": "UAYPH6EAE",
           "placeholder": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Select a user"
           }
         }
@@ -644,7 +645,7 @@ var blockOptions = {
           "type": "channels_select",
           "initial_channel": "C024BE7TA",
           "placeholder": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Select a channel"
           }
         }
@@ -661,7 +662,7 @@ var blockOptions = {
           "type": "conversations_select",
           "initial_conversation": "C024BENFU",
           "placeholder": {
-            "type": "plaintext",
+            "type": "plain_text",
             "text": "Select a conversation"
           }
         }
@@ -675,7 +676,7 @@ var blockOptions = {
             "action_id": "users_selectasdfasdga",
             "initial_user": "UAYPH6EAE",
             "placeholder": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Select a conversation"
             }
           }
@@ -690,7 +691,7 @@ var blockOptions = {
             "action_id": "channels_selectasdfasdf",
             "initial_channel": "C024BE7TA", // #general on test.slack.com
             "placeholder": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Select a channel"
             }
           }
@@ -705,7 +706,7 @@ var blockOptions = {
             "action_id": "conversations_selectsdgsdferja",
             "initial_conversation": "C024BENFU", // #random on test.slack.com
             "placeholder": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "Select a conversation"
             }
           }
@@ -717,8 +718,9 @@ var blockOptions = {
         "elements": [
           {
             "type": "button",
+            "action_id": "google_button",
             "text": {
-              "type": "plaintext",
+              "type": "plain_text",
               "text": "The Google"
             },
             "url": "https://www.google.com/"

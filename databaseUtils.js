@@ -7,7 +7,7 @@ var utils = require('./utils.js')
 
 var databaseUtils = {
 
-	getToken: function(teamID,dbCollection){
+	getToken: function(teamID,dbCollection,userID){
 		return new Promise(
       function (resolve, reject) {
         mongodb.MongoClient.connect(uri, function(err, client) {
@@ -17,6 +17,23 @@ var databaseUtils = {
             assert.equal(err, null)
             console.log("Success: Found the token")
             //console.dir(doc)
+            resolve(doc.access_token)   
+          })
+        })
+      }    
+    )    
+	},
+  
+  getUserToken: function(teamID,dbCollection,userID){
+		return new Promise(
+      function (resolve, reject) {
+        mongodb.MongoClient.connect(uri, function(err, client) {
+          if(err) reject(err)
+          var db = client.db('bradslavin')
+          db.collection(dbCollection).findOne({ user_id: userID}, function(err, doc) {
+            assert.equal(err, null)
+            console.log("Success: Found the token")
+            console.dir(doc)
             resolve(doc.access_token)   
           })
         })
@@ -46,7 +63,7 @@ var databaseUtils = {
     )
 	},
 
-	getBotToken: function(teamID, responseOptions){
+	getBotToken: function(teamID){
 		return new Promise(
 	  		function (resolve, reject) {
 				mongodb.MongoClient.connect(uri, function(err, client) {

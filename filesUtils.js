@@ -34,7 +34,7 @@ var filesUtils = {
     
   },
   
-  "addFileToSlack": function(fileName, fileType, token, userID, isPreview){
+  "addFileToSlack": function(fileName, fileType, token, userID, isPreview, indexableContent){
      return new Promise(
       function (resolve, reject) {
 
@@ -42,23 +42,24 @@ var filesUtils = {
         var newFileExternalURL = 'http://rooster.glitch.me/file_viewer?id='+newFileGUID
         //var newTitle = fileInfo.name
         var previewData = ""
-        if (isPreview){
-          previewData = fs.createReadStream('./assets/temp.jpg')
+        if (isPreview == "yes"){
+          previewData = fs.createReadStream('./assets/tor.png')
         }
         var data = {
           "token": token,
           "external_id": newFileGUID,
           "external_url": newFileExternalURL,
           "title": fileName,
-          "type": fileType,
-          "preview": previewData
+          "filetype": fileType,
+          "preview_image": previewData,
+          //"indexable_file_contents":indexableContent
           
           }
 
         request({
           url: process.env.SLACK_URL + "/api/files.remote.add",
           formData: data,
-          headers: { "X-Slack-User": userID},
+          //headers: { "X-Slack-User": userID},
           method: 'POST'
           },
           function (error, response, body) {
@@ -84,7 +85,8 @@ var filesUtils = {
         var data = {
           "token": token,
           //"external_id": newFileGUID, // option to user external_id
-          "file": fileID // Slack fileID
+          "file": fileID, // Slack fileID
+         // "external_id": fileID
           }
         // https://api.slack.com/methods/files.remote.remove
         request.post(
@@ -108,15 +110,17 @@ var filesUtils = {
     
   },
   
-  "getFileInfoFromSlack": function(token, fileID){
+  "getFileInfoFromSlack": function(token, fileID, externalID){
     return new Promise(
       function (resolve, reject) {
-        var data = {
-          "token": token,
-          //"external_id": newFileGUID, // option to user external_id
-          "file": fileID // Slack fileID
-          }
-        // https://api.slack.com/methods/files.remote.remove
+        var data ={}
+        data.token = token
+        if (externalID){
+          data.external_id = externalID
+        }
+        else if (fileID){
+          data.file = fileID
+        }
         request.post(
           process.env.SLACK_URL + "/api/files.remote.info",
           {
@@ -179,14 +183,15 @@ var filesUtils = {
 
           var data = {
             "token": token,
-            "channel": channelID,
-            "file": fileID,
+            //"channel": "C6E14H3P1,CETH9HK6E",
+            "channels": channelID,
+            "file": fileID
           }
           
         request({
           url: process.env.SLACK_URL + "/api/files.remote.share",
           form: data,
-          headers: { "X-Slack-User": userID},
+          //headers: { "X-Slack-User": userID},
           method: 'POST'
           },
           function (error, response, body) {
@@ -208,19 +213,33 @@ var filesUtils = {
     "updateFileInSlack": function(token, externalID, externalURL, fileID, preview, title){
       return new Promise(
         function (resolve, reject) {
-          var data = {
-            "token": token,
-            "external_ id": externalID,
-            "external_url": externalURL,
-            "file": fileID,
-            "preview": "",
-            "title": title
-            }
-          // https://api.slack.com/methods/files.remote.remove
+          var data = {}
+          data.token = token
+          if (externalID){
+            data.external_id = externalID
+          }
+          if (externalURL){
+            data.external_url = externalURL
+          }
+          if (fileID) {
+            data.file = fileID
+          }
+          if (title) {
+            data.title = title
+          }
+          if (preview == "yes"){
+            data.preview_image = fs.createReadStream('./assets/tor.png')
+          }
+  
           request.post(
-            process.env.SLACK_URL + "/api/files.remote.update",
+            //process.env.SLACK_URL + "/api/files.remote.update",
             {
-              form: data
+              url: process.env.SLACK_URL + "/api/files.remote.update",
+              formData: data,
+              //headers: { "X-Slack-User": userID},
+              method: 'POST'
+              //formData: data,
+              //form: data
             },
             function (error, response, body) {
               if (!error && response.statusCode == 200) {

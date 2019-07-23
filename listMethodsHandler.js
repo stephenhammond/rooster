@@ -13,14 +13,17 @@ var listMethodsHandler = {
   //basic function to send a message to Slack using the response URL included with requests
 	callMethodWithLimitAndCursor: function(token, method, limit, requestBody, cursor){
     console.log("call list method!!");
-    //limit = 100 // just hardcoding for testing
+    limit = 24; //hardcoding for testing
+    console.log(token)
 		var data = {
       token: token,
       limit: limit,
-      pretty: true
+      //pretty: true
     }
     if (cursor){
-      data.cursor = cursor
+      data.cursor = cursor;
+    }else{
+      data.cursor = "";
     }
     if (method == "reactions.list"){ // if reactions.list
       data.user = requestBody.user.id
@@ -28,9 +31,12 @@ var listMethodsHandler = {
         
     if (method == "files.info"){ // if files.info
       data.file = "FBT0ENW6P" // hardcode file ID
-    }   
+    }
+    //     if (method == "files.list"){ // if files.info
+    // data.file = "FBT0ENW6P" // hardcode file ID
+    //     }
         
-    
+    console.log(method)
 		request.post(
           process.env.SLACK_URL + "/api/" + method,
         {

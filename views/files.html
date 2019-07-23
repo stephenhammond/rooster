@@ -20,30 +20,50 @@
     <main>
       <form ref="uploadForm" id="uploadForm" action="https://rooster.glitch.me/upload-file" method="post" enctype="multipart/form-data">
         <input type="file" name="uploadFile" />
-        <input type="text" placeholder="team ID" name="teamID" />
-        <input type="text" placeholder="channel ID" name="channelID" />
-        <input type="text" placeholder="userID" name="userID" />
-        <input type="text" placeholder="fileType" name="fileType" />
-        <input type="text" placeholder="preview?" name="isPreview" />
+        <input type="text" placeholder="team ID" name="teamID" value="T024BE7SJ"/>
+        <input type="text" placeholder="channel ID" name="channelID" value="CJZU0Q2JZ"/>
+        <input type="text" placeholder="userID" name="userID" value="U9WD2JTBP"/>
+    
+        <input list="filetypes" name="fileType" placeholder="filetype"/>
+          <datalist id="filetypes">
+            <option value="doc"></option>
+            <option value="xls"></option>
+            <option value="ppt"></option>
+            <option value="jpg"></option>
+            <option value="directory"></option>
+          </datalist>
+        
+        Show preview<input type="checkbox" name="isPreview" value="yes" checked>
+        Share as user<input type="checkbox" name="shareAsUser" value="yes">
+   
+        
+        <!-- <input type="text" placeholder="Indexable content (not currently supported)" name="indexableContent" /> -->
         <input type="submit" value="Upload File" />
       </form>  
-      <br>
+      
       <form ref="removeForm" id="removeForm" action="https://rooster.glitch.me/remove-file" method="post" enctype="multipart/form-data">
-        <input type="text" placeholder="team ID" name="teamID" />
+        <input type="text" placeholder="team ID" name="teamID" value="T024BE7SJ"/>
         <input type="text" placeholder="file ID" name="fileID" />
         <input type="submit" value="Remove File" />
       </form> 
-      <br>
+      
       <form ref="updateForm" id="updateForm" action="https://rooster.glitch.me/update-file" method="post" enctype="multipart/form-data">
-        <input type="text" placeholder="team ID" name="teamID" />
+        <input type="text" placeholder="team ID" name="teamID" value="T024BE7SJ"/>
         <input type="text" placeholder="file ID" name="fileID" />
         <input type="text" placeholder="external ID" name="fileExternalID" />
         <input type="text" placeholder="external URL" name="fileExternalURL" />
-     <!--   <input type="file" placeholder="preview" name="filePreview" /> -->
         <input type="text" placeholder="title" name="fileTitle" />
+        Update preview <input type="checkbox" name="updatePreview" value="yes" checked>
         <input type="submit" value="Update File" />
       </form> 
-      
+       
+      <form ref="getInfoForm" id="getInfoForm" action="https://rooster.glitch.me/info-file" method="post" enctype="multipart/form-data">
+        <input type="tex" placeholder="team ID" name="teamID" value="T024BE7SJ"/>
+        <input type="text" placeholder="file ID" name="fileID" />
+        <input type="text" placeholder="external ID" name="fileExternalID" />
+       
+        <input type="submit" value="Get File Info" />
+      </form> 
       
     </main>
 
